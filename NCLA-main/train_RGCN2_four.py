@@ -26,7 +26,7 @@ import os
 import random
 from datetime import datetime
 from torch.optim import lr_scheduler
-
+from torch.optim.lr_scheduler import ReduceLROnPlateau,MultiStepLR
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
@@ -110,7 +110,9 @@ def train(model, data_o, features, adj, train_loader, val_loader, test_loader, t
     # data_o.cuda()
     best_models = []  # 保存效果最好的模型
     best_accs = []  # 保存最大的acc
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=warmup_epoch, gamma=0.1)
+    # scheduler = lr_scheduler.StepLR(optimizer, step_size=warmup_epoch, gamma=0.1)
+    # scheduler = ReduceLROnPlateau(optimizer, 'max',patience=25)
+    scheduler = MultiStepLR(optimizer, milestones=[500,1000], gamma=0.1)
     test_acc_history = 0
     for epoch in range(epochs):
         if epoch >= 0:
@@ -133,7 +135,8 @@ def train(model, data_o, features, adj, train_loader, val_loader, test_loader, t
 
             multihead_con_loss = multihead_contrastive_loss(heads, adj, tau=tau)
 
-            sub_loss = sub_structure_constrastive_loss(heads,adj)
+            sub_loss = sub_structure_constrastive_loss(heads,adj,tau = tau)
+            # sub_loss = 0
 
             loss_train = loss_rate_multi * multihead_con_loss + loss_rate_mlp * mlp_loss + sub_loss * loss_rate_substructure
             loss_train_history.append(loss_train.cpu().detach().numpy())
@@ -141,7 +144,7 @@ def train(model, data_o, features, adj, train_loader, val_loader, test_loader, t
             optimizer.step()
             train_label_list += label_list
             train_pred_list += [int(x) for x in list(torch.argmax(mlp_out, dim=1))]
-        # scheduler.step()
+
         # train_acc, train_f1_score, tain_recall, train_precision = evaluation_metrics(y_label_list=train_label_list, y_pred_list=train_pred_list)
         # val_label_list, val_pred_list = prediction(model, val_loader)
         # val_acc, val_f1_score, val_recall, val_precision = evaluation_metrics(y_label_list=val_label_list,y_pred_list=val_pred_list)
@@ -151,25 +154,29 @@ def train(model, data_o, features, adj, train_loader, val_loader, test_loader, t
         # compute evaluation
         test_acc, test_f1_score, test_recall, test_precision = evaluation_metrics(y_label_list=test_label_list,
                                                                                   y_pred_list=test_pred_list)
+        scheduler.step()
         # train_eva_data = [loss_train, train_acc, train_f1_score, tain_recall, train_precision]
         # train_eva_data = [tensor.item() for tensor in train_eva_data]
         # val_save_data=[val_acc, val_f1_score, val_recall, val_precision]
         test_save_data = [epoch,test_acc, test_f1_score, test_recall, test_precision]
         if epoch >= 0:
             dur.append(time.time() - t0)
-        print("Epoch {:04d} | Time(s) {:.4f} | TrainLoss {:.4f} ".format(epoch + 1, np.mean(dur),
+        time1 = time.time() - t0
+        print("Epoch {:04d} | Time(s) {:.4f} | TrainLoss {:.4f} ".format(epoch + 1, time1,
                                                                          sum(loss_train_history) / len(
                                                                              loss_train_history)))
-        if test_acc > test_acc_history:
 
+
+        # save_evalution_metrics(train_save_path, train_eva_data,epoch, train_result=True)
+        # save_evalution_metrics(val_save_path, val_save_data, epoch,train_result=False)
+
+        if test_acc > test_acc_history:
             print(
                 "test accuaray:{:.4f}; test f1_score:{:.4f}; test recall:{:.4f}; test precision:{:.4f}".format(test_acc,
                                                                                                                test_f1_score,
                                                                                                                test_recall,
                                                                                                                test_precision))
 
-            # save_evalution_metrics(train_save_path, train_eva_data,epoch, train_result=True)
-            # save_evalution_metrics(val_save_path, val_save_data, epoch,train_result=False)
             save_evalution_metrics(test_save_path, test_save_data, epoch, train_result=False)
             test_acc_history = test_acc
             checkpoint_path = os.path.join(checkpoints_path, f'model{epoch}.pth')
@@ -188,17 +195,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GAT_RGCN')
     parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
-    parser.add_argument("--batch-size", type=int, default=1024,
+    parser.add_argument("--batch-size", type=int, default=4096,
                         help="loader small_data")
-    parser.add_argument("--dataset", type=str, default='small',
+    parser.add_argument("--dataset", type=str, default='big',
                         help="small or big dataset")
-    parser.add_argument("--epochs", type=int, default=15,
+    parser.add_argument("--epochs", type=int, default=1500,
                         help="number of training epochs")
     parser.add_argument("--num-heads", type=int, default=4,
                         help="number of hidden attention heads")
     parser.add_argument("--num-layers", type=int, default=1,
                         help="number of hidden layers")
-    parser.add_argument("--num-hidden", type=int, default=32,
+    parser.add_argument("--num-hidden", type=int, default=128,
                         help="number of hidden units")
     parser.add_argument("--loss-rate-mlp", type=float, default=0.8,
                         help=" mlp loss rate ")
@@ -216,13 +223,13 @@ if __name__ == '__main__':
                         help="input feature dropout")
     parser.add_argument("--attn-drop", type=float, default=0.5,
                         help="attention dropout")
-    parser.add_argument("--lr", type=float, default=0.001,
+    parser.add_argument("--lr", type=float, default=0.003,
                         help="learning rate")
     parser.add_argument('--weight-decay', type=float, default=1e-4,
                         help="weight decay")
     parser.add_argument('--negative-slope', type=float, default=0.2,
                         help="the negative slope of leaky relu")
-    parser.add_argument('--zhongzi', type=int, default=0,
+    parser.add_argument('--zhongzi', type=int, default=4,
                         help=" ")
     parser.add_argument('--save-dir', type=str, default='./result4',
                         help="save dir")
@@ -328,4 +335,8 @@ if __name__ == '__main__':
         features = features.cuda()
         adj = adj.cuda()
         data_o = data_o.cuda()
+    # print(model)
+    # print(features)
+    # print(adj)
+    # print(data_o)
     train(model, data_o, features, adj, train_loader, val_loader, test_loader, tau, save_path=save_path)

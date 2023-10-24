@@ -66,6 +66,7 @@
           <excludedPaths>
             <excludedPath path="/project/reproduct_paper/ProG-main/ProG/MRCGNN/data/drug_listxiao.csv" />
             <excludedPath path="/project/reproduct_paper/NCLA-main/MRCGNN_code/data_preprocess.py" />
+            <excludedPath path="/project/reproduct_paper/KG_CPI/electron_density/our1_xtb_xyz_std" />
           </excludedPaths>
         </serverdata>
       </paths>

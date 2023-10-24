@@ -229,7 +229,7 @@ if __name__ == '__main__':
                         help="weight decay")
     parser.add_argument('--negative-slope', type=float, default=0.2,
                         help="the negative slope of leaky relu")
-    parser.add_argument('--zhongzi', type=int, default=0,
+    parser.add_argument('--zhongzi', type=int, default=4,
                         help=" ")
     parser.add_argument('--save-dir', type=str, default='./result',
                         help="save dir")
@@ -273,7 +273,7 @@ if __name__ == '__main__':
             file.write(f'{key}: {value}\n')
     set_random_seed(1, deterministic=False)
     # data_o原始图数据
-    if dataset_size=='small':
+    if dataset_size == 'small':
         data_o, train_loader, val_loader, test_loader = load_small_data(zhongzi, args.batch_size, workers=4)
     else:
         data_o, train_loader, val_loader, test_loader = load_big_data(zhongzi, args.batch_size, workers=4)
@@ -292,7 +292,7 @@ if __name__ == '__main__':
     adj2 = sp.csr_matrix(adjacency_matrix)
     features = sp.csc_matrix(data_o.x)
     Y = data_o.edge_type
-    #?
+    # ?
     features[features > 0] = 1
     g = dgl.from_scipy(adj2)
     if args.gpu >= 0 and torch.cuda.is_available():
@@ -306,7 +306,7 @@ if __name__ == '__main__':
     adj = torch.tensor(adj2.todense())
     all_time = time.time()
     num_feats = features.shape[1]
-    if dataset_size=='small':
+    if dataset_size == 'small':
         n_classes = len(set(Y))
     else:
         n_classes = 86
@@ -314,16 +314,15 @@ if __name__ == '__main__':
     g = dgl.add_self_loop(g)
     heads = ([num_heads] * num_layers)
     model = GAT_RGCN_2(g,
-                        num_layers,
-                        num_feats,
-                        num_hidden,
-                        heads,
-                        F.elu,
-                        in_drop,
-                        attn_drop,
-                        negative_slope,
-                        n_classes)
-
+                       num_layers,
+                       num_feats,
+                       num_hidden,
+                       heads,
+                       F.elu,
+                       in_drop,
+                       attn_drop,
+                       negative_slope,
+                       n_classes)
     # use optimizer
     optimizer = torch.optim.Adam(
         model.parameters(), lr=lr, weight_decay=weight_decay)

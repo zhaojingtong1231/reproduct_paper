@@ -194,7 +194,7 @@ if __name__ == '__main__':
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--batch-size", type=int, default=2048,
                         help="loader small_data")
-    parser.add_argument("--dataset", type=str, default='small',
+    parser.add_argument("--dataset", type=str, default='big',
                         help="small or big dataset")
     parser.add_argument("--epochs", type=int, default=1200,
                         help="number of training epochs")
