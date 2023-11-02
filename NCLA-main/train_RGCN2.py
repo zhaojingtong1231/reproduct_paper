@@ -112,7 +112,7 @@ def train(model, data_o, features, adj, train_loader, val_loader, test_loader, t
     best_accs = []  # 保存最大的acc
     # scheduler = lr_scheduler.StepLR(optimizer, step_size=warmup_epoch, gamma=0.1)
     # scheduler = ReduceLROnPlateau(optimizer, 'max',patience=25)
-    scheduler = MultiStepLR(optimizer, milestones=[500,1000], gamma=0.1)
+    scheduler = MultiStepLR(optimizer, milestones=[500,800,1000], gamma=0.1)
     test_acc_history = 0
     for epoch in range(epochs):
         if epoch >= 0:
@@ -195,9 +195,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GAT_RGCN')
     parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
-    parser.add_argument("--batch-size", type=int, default=4096,
+    parser.add_argument("--batch-size", type=int, default=2048,
                         help="loader small_data")
-    parser.add_argument("--dataset", type=str, default='big',
+    parser.add_argument("--dataset", type=str, default='small',
                         help="small or big dataset")
     parser.add_argument("--epochs", type=int, default=1500,
                         help="number of training epochs")
@@ -207,11 +207,11 @@ if __name__ == '__main__':
                         help="number of hidden layers")
     parser.add_argument("--num-hidden", type=int, default=128,
                         help="number of hidden units")
-    parser.add_argument("--loss-rate-mlp", type=float, default=0.8,
+    parser.add_argument("--loss-rate-mlp", type=float, default=1,
                         help=" mlp loss rate ")
-    parser.add_argument("--loss-rate-multi", type=float, default=0.5,
+    parser.add_argument("--loss-rate-multi", type=float, default=0.6,
                         help="multi loss rate")
-    parser.add_argument("--loss-rate-substructure",type=float,default=0.15,
+    parser.add_argument("--loss-rate-substructure",type=float,default=0.2,
                         help='sub_structure loss rate')
     parser.add_argument("--tau", type=float, default=1,
                         help="temperature-scales")
@@ -223,13 +223,13 @@ if __name__ == '__main__':
                         help="input feature dropout")
     parser.add_argument("--attn-drop", type=float, default=0.5,
                         help="attention dropout")
-    parser.add_argument("--lr", type=float, default=0.003,
+    parser.add_argument("--lr", type=float, default=0.0005,
                         help="learning rate")
     parser.add_argument('--weight-decay', type=float, default=1e-4,
                         help="weight decay")
     parser.add_argument('--negative-slope', type=float, default=0.2,
                         help="the negative slope of leaky relu")
-    parser.add_argument('--zhongzi', type=int, default=4,
+    parser.add_argument('--zhongzi', type=int, default=1,
                         help=" ")
     parser.add_argument('--save-dir', type=str, default='./result',
                         help="save dir")

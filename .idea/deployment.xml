@@ -1,86 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="paddle_user@112.53.86.218:10022 password (8)" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="paddle_user@112.53.86.218:10022 password" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="deepdds">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="paddle_user@112.53.86.218:10022 password">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (2)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (3)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (4)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (5)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (6)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (7)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (8)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/project/reproduct_paper" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-          <excludedPaths>
-            <excludedPath path="/project/reproduct_paper/ProG-main/ProG/MRCGNN/data/drug_listxiao.csv" />
-            <excludedPath path="/project/reproduct_paper/NCLA-main/MRCGNN_code/data_preprocess.py" />
-            <excludedPath path="/project/reproduct_paper/KG_CPI/electron_density/our1_xtb_xyz_std" />
-          </excludedPaths>
-        </serverdata>
-      </paths>
-      <paths name="paddle_user@112.53.86.218:10022 password (9)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/project/reproduct_paper" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="root@59.73.198.168:22 password">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/project/reproduct_paper" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

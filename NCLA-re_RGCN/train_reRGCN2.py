@@ -18,8 +18,7 @@ from gat_RGCN import GAT_RGCN_2
 import torch.nn as nn
 from loss import multihead_contrastive_loss,sub_structure_constrastive_loss
 import warnings
-from sklearn.metrics import f1_score, accuracy_score, recall_score, \
-    precision_score
+from sklearn.metrics import f1_score, accuracy_score, recall_score,precision_score
 from data_preprocess_small import load_small_data
 from data_preprocess_big import load_big_data
 import os
@@ -195,7 +194,7 @@ if __name__ == '__main__':
                         help="loader small_data")
     parser.add_argument("--dataset", type=str, default='small',
                         help="small or big dataset")
-    parser.add_argument("--epochs", type=int, default=5000,
+    parser.add_argument("--epochs", type=int, default=1500,
                         help="number of training epochs")
     parser.add_argument("--num-heads", type=int, default=4,
                         help="number of hidden attention heads")
@@ -203,7 +202,7 @@ if __name__ == '__main__':
                         help="number of hidden layers")
     parser.add_argument("--num-hidden", type=int, default=128,
                         help="number of hidden units")
-    parser.add_argument("--loss-rate-mlp", type=float, default=0.8,
+    parser.add_argument("--loss-rate-mlp", type=float, default=1,
                         help=" mlp loss rate ")
     parser.add_argument("--loss-rate-multi", type=float, default=0.5,
                         help="multi loss rate")
