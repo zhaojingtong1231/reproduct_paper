@@ -1,5 +1,0 @@
-nohup python train_RGCN2.py  --lr=0.001 --dataset='small' --zhongzi=0 --epochs=1500  --batch-size 1024 --num-heads=4 --num-layers=1 --num-hidden=128 --loss-rate-mlp=0.8 --loss-rate-multi=0.5  --loss-rate-substructure=0 --seed=1  &
-nohup python train_RGCN2.py  --lr=0.001 --dataset='small' --zhongzi=1 --epochs=1500  --batch-size 1024 --num-heads=4 --num-layers=1 --num-hidden=128 --loss-rate-mlp=0.8 --loss-rate-multi=0.5  --loss-rate-substructure=0 --seed=1  &
-nohup python train_RGCN2.py  --lr=0.001 --dataset='small' --zhongzi=2 --epochs=1500  --batch-size 1024 --num-heads=4 --num-layers=1 --num-hidden=128 --loss-rate-mlp=0.8 --loss-rate-multi=0.5  --loss-rate-substructure=0 --seed=1  &
-nohup python train_RGCN2.py  --lr=0.001 --dataset='small' --zhongzi=3 --epochs=1500  --batch-size 1024 --num-heads=4 --num-layers=1 --num-hidden=128 --loss-rate-mlp=0.8 --loss-rate-multi=0.5  --loss-rate-substructure=0 --seed=1  &
-nohup python train_RGCN2.py  --lr=0.001 --dataset='small' --zhongzi=4 --epochs=1500  --batch-size 1024 --num-heads=4 --num-layers=1 --num-hidden=128 --loss-rate-mlp=0.8 --loss-rate-multi=0.5  --loss-rate-substructure=0 --seed=1  &
