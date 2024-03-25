@@ -33,9 +33,9 @@ class Encoder(nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
 
-        T = 3
+        T = 3 #迭代次数
         assert k >= 2
-        self.k = k
+        self.k = k #迭代次数
         self.skip = skip
         if not self.skip:
             self.conv = [base_model(in_channels, 2 * out_channels).jittable()]
