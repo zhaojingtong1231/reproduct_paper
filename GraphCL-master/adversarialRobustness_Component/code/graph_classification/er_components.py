@@ -59,6 +59,6 @@ if __name__ == '__main__':
 
             if best_loss is None or test_loss[0] < best_loss:
                 best_loss = test_loss[0]
-                print('----saving to best model since this is the best valid loss so far.----')
+                print('----saving to best model since this is the best test loss so far.----')
                 torch.save(classifier.state_dict(), cmd_args.save_dir + '/epoch-best.model')
                 save_args(cmd_args.save_dir + '/epoch-best-args.pkl', cmd_args)

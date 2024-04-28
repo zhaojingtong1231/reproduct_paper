@@ -12,7 +12,9 @@ from datasets.kg_dataset import KGDataset
 from models import all_models
 from optimizers.kg_optimizer import KGOptimizer
 from utils.train import get_savedir, avg_both, format_metrics, count_params
+import os
 
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 parser = argparse.ArgumentParser(
     description="Knowledge Graph Embedding"
 )
@@ -21,7 +23,7 @@ parser.add_argument(
     help="Knowledge Graph dataset"
 )
 parser.add_argument(
-    "--model", default="RotH", choices=all_models, help="Knowledge Graph embedding model"
+    "--model", default="RotatE", choices=all_models, help="Knowledge Graph embedding model"
 )
 parser.add_argument(
     "--regularizer", choices=["N3", "F2"], default="N3", help="Regularizer"
@@ -34,22 +36,22 @@ parser.add_argument(
     help="Optimizer"
 )
 parser.add_argument(
-    "--max_epochs", default=50, type=int, help="Maximum number of epochs to train for"
+    "--max_epochs", default=200, type=int, help="Maximum number of epochs to train for"
 )
 parser.add_argument(
     "--patience", default=10, type=int, help="Number of epochs before early stopping"
 )
 parser.add_argument(
-    "--test", default=1, type=float, help="Number of epochs before validation"
+    "--valid", default=1, type=float, help="Number of epochs before validation"
 )
 parser.add_argument(
     "--rank", default=32, type=int, help="Embedding dimension"
 )
 parser.add_argument(
-    "--batch_size", default=512, type=int, help="Batch size"
+    "--batch_size", default=256, type=int, help="Batch size"
 )
 parser.add_argument(
-    "--neg_sample_size", default=-1, type=int, help="Negative sample size, -1 to not use negative sampling"
+    "--neg_sample_size", default=100, type=int, help="Negative sample size, -1 to not use negative sampling"
 )
 parser.add_argument(
     "--dropout", default=0, type=float, help="Dropout rate"
@@ -64,7 +66,7 @@ parser.add_argument(
     "--gamma", default=0, type=float, help="Margin for distance-based losses"
 )
 parser.add_argument(
-    "--bias", default="constant", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)"
+    "--bias", default="learn", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)"
 )
 parser.add_argument(
     "--dtype", default="double", type=str, choices=["single", "double"], help="Machine precision"
@@ -109,7 +111,7 @@ def train(args):
     # load data
     logging.info("\t " + str(dataset.get_shape()))
     train_examples = dataset.get_examples("train")
-    valid_examples = dataset.get_examples("test")
+    # valid_examples = dataset.get_examples("test")
     test_examples = dataset.get_examples("test")
     filters = dataset.get_filters()
 
@@ -122,6 +124,7 @@ def train(args):
     total = count_params(model)
     logging.info("Total number of parameters {}".format(total))
     device = "cuda"
+    # device = "cpu"
     model.to(device)
 
     # get optimizer
@@ -137,20 +140,16 @@ def train(args):
 
         # Train step
         model.train()
-        valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+
         train_loss = optimizer.epoch(train_examples)
         logging.info("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
 
-        # Valid step
-        model.eval()
-        valid_loss = optimizer.calculate_valid_loss(valid_examples)
-        logging.info("\t Epoch {} | average test loss: {:.4f}".format(step, valid_loss))
 
         if (step + 1) % args.valid == 0:
-            valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
-            logging.info(format_metrics(valid_metrics, split="test"))
+            test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+            logging.info(format_metrics(test_metrics, split="test"))
 
-            valid_mrr = valid_metrics["MRR"]
+            valid_mrr = test_metrics["MRR"]
             if not best_mrr or valid_mrr > best_mrr:
                 best_mrr = valid_mrr
                 counter = 0
@@ -178,12 +177,9 @@ def train(args):
     model.eval()
 
     # Validation metrics
-    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
-    logging.info(format_metrics(valid_metrics, split="test"))
-
-    # Test metrics
     test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
     logging.info(format_metrics(test_metrics, split="test"))
+
 
 
 if __name__ == "__main__":

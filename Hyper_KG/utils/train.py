@@ -55,6 +55,7 @@ def write_metrics(writer, step, metrics, split):
     writer.add_scalar('{}_H10'.format(split), metrics['hits@[1,3,10]'][2], global_step=step)
 
 
+
 def count_params(model):
     """Count total number of trainable parameters in model"""
     total = 0

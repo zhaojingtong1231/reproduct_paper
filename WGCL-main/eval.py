@@ -101,7 +101,7 @@ def get_idx_split(dataset, split, preload_split):
         return {
             'train': split_idx['train'],
             'test': split_idx['test'],
-            'val': split_idx['valid']
+            'val': split_idx['test']
         }
     elif split.startswith('wikics'):
         split_idx = int(split.split(':')[1])

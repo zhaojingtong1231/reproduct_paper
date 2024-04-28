@@ -43,7 +43,7 @@ def scaffold_split(dataset, smiles_list, task_idx=None, null_value=0,
     :param frac_valid:
     :param frac_test:
     :param return_smiles:
-    :return: train, valid, test slices of the input dataset obj. If
+    :return: train, test, test slices of the input dataset obj. If
     return_smiles = True, also returns ([train_smiles_list],
     [valid_smiles_list], [test_smiles_list])
     """
@@ -76,7 +76,7 @@ def scaffold_split(dataset, smiles_list, task_idx=None, null_value=0,
             all_scaffolds.items(), key=lambda x: (len(x[1]), x[1][0]), reverse=True)
     ]
 
-    # get train, valid test indices
+    # get train, test test indices
     train_cutoff = frac_train * len(smiles_list)
     valid_cutoff = (frac_train + frac_valid) * len(smiles_list)
     train_idx, valid_idx, test_idx = [], [], []
@@ -124,7 +124,7 @@ def random_scaffold_split(dataset, smiles_list, task_idx=None, null_value=0,
     :param frac_valid:
     :param frac_test:
     :param seed;
-    :return: train, valid, test slices of the input dataset obj
+    :return: train, test, test slices of the input dataset obj
     """
 
     np.testing.assert_almost_equal(frac_train + frac_valid + frac_test, 1.0)
@@ -183,7 +183,7 @@ def random_split(dataset, task_idx=None, null_value=0,
     :param frac_test:
     :param seed:
     :param smiles_list: list of smiles corresponding to the dataset obj, or None
-    :return: train, valid, test slices of the input dataset obj. If
+    :return: train, test, test slices of the input dataset obj. If
     smiles_list != None, also returns ([train_smiles_list],
     [valid_smiles_list], [test_smiles_list])
     """
@@ -242,7 +242,7 @@ def cv_random_split(dataset, fold_idx = 0,
     :param frac_test:
     :param seed:
     :param smiles_list: list of smiles corresponding to the dataset obj, or None
-    :return: train, valid, test slices of the input dataset obj. If
+    :return: train, test, test slices of the input dataset obj. If
     smiles_list != None, also returns ([train_smiles_list],
     [valid_smiles_list], [test_smiles_list])
     """

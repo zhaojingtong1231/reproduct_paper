@@ -225,7 +225,7 @@ class BioDataset_aug(InMemoryDataset):
         return 'geometric_data_processed.pt'
 
     def download(self):
-        raise NotImplementedError('Must indicate valid location of raw small_data. '
+        raise NotImplementedError('Must indicate test location of raw small_data. '
                                   'No download allowed')
 
     def process(self):
@@ -373,7 +373,7 @@ class BioDataset(InMemoryDataset):
         return 'geometric_data_processed.pt'
 
     def download(self):
-        raise NotImplementedError('Must indicate valid location of raw small_data. '
+        raise NotImplementedError('Must indicate test location of raw small_data. '
                                   'No download allowed')
 
     def process(self):

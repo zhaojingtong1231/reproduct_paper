@@ -12,7 +12,7 @@ class Hyperboloid(Manifold):
 
     We use the following convention: -x0^2 + x1^2 + ... + xd^2 = -K
 
-    c = 1 / K is the hyperbolic curvature. 
+    c = 1 / K is the hyperbolic curvature. 曲率
     """
 
     def __init__(self):

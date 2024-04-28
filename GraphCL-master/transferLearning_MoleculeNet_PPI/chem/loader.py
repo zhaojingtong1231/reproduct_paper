@@ -340,7 +340,7 @@ class MoleculeDataset_aug(InMemoryDataset):
         return 'geometric_data_processed.pt'
 
     def download(self):
-        raise NotImplementedError('Must indicate valid location of raw small_data. '
+        raise NotImplementedError('Must indicate test location of raw small_data. '
                                   'No download allowed')
 
     def process(self):
@@ -915,7 +915,7 @@ class MoleculeDataset(InMemoryDataset):
         return 'geometric_data_processed.pt'
 
     def download(self):
-        raise NotImplementedError('Must indicate valid location of raw small_data. '
+        raise NotImplementedError('Must indicate test location of raw small_data. '
                                   'No download allowed')
 
     def process(self):
@@ -1583,7 +1583,7 @@ def _load_bace_dataset(input_path):
     # there are no nans
     folds = input_df['Model']
     folds = folds.replace('Train', 0)   # 0 -> train
-    folds = folds.replace('Valid', 1)   # 1 -> valid
+    folds = folds.replace('Valid', 1)   # 1 -> test
     folds = folds.replace('Test', 2)    # 2 -> test
     assert len(smiles_list) == len(rdkit_mol_objs_list)
     assert len(smiles_list) == len(labels)

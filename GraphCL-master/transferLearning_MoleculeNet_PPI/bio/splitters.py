@@ -13,7 +13,7 @@ def random_split(dataset, frac_train=0.8, frac_valid=0.1, frac_test=0.1,
     :param frac_valid:
     :param frac_test:
     :param seed:
-    :return: train, valid, test slices of the input dataset obj.
+    :return: train, test, test slices of the input dataset obj.
     """
     np.testing.assert_almost_equal(frac_train + frac_valid + frac_test, 1.0)
 

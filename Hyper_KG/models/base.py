@@ -165,6 +165,7 @@ class KGModel(nn.Module, ABC):
             candidates = self.get_rhs(queries, eval_mode=True)
             while b_begin < len(queries):
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
+                # these_queries = queries[b_begin:b_begin + batch_size]
 
                 q = self.get_queries(these_queries)
                 rhs = self.get_rhs(these_queries, eval_mode=False)
@@ -174,7 +175,7 @@ class KGModel(nn.Module, ABC):
 
                 # set filtered and true scores to -1e6 to be ignored
                 for i, query in enumerate(these_queries):
-
+                    # print(query)
                     filter_out = filters[(query[0].item(), query[1].item())]
                     filter_out += [queries[b_begin + i, 2].item()]
                     scores[i, torch.LongTensor(filter_out)] = -1e6
@@ -184,7 +185,7 @@ class KGModel(nn.Module, ABC):
                 b_begin += batch_size
         return ranks
 
-    def compute_metrics(self, examples, filters, batch_size=500):
+    def compute_metrics(self, examples, filters, batch_size=1024):
         """Compute ranking-based evaluation metrics.
     
         Args:
@@ -212,7 +213,7 @@ class KGModel(nn.Module, ABC):
             mean_reciprocal_rank[m] = torch.mean(1. / ranks).item()
             hits_at[m] = torch.FloatTensor((list(map(
                 lambda x: torch.mean((ranks <= x).float()).item(),
-                (1, 3, 10)
+                (1, 3, 10,100)
             ))))
 
         return mean_rank, mean_reciprocal_rank, hits_at
