@@ -77,7 +77,7 @@ class AttH(BaseH):
 
     def __init__(self, args):
         super(AttH, self).__init__(args)
-        self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)
+        self.rel_diag = nn.Embe0dding(self.sizes[1], 2 * self.rank)
         self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], 2 * self.rank), dtype=self.data_type) - 1.0
         self.context_vec = nn.Embedding(self.sizes[1], self.rank)
         self.context_vec.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
