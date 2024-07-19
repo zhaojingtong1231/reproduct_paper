@@ -1,0 +1,5 @@
+requests
+pyOpenSSL
+pandas
+xlrd
+biodblinker

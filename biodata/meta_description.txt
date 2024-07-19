@@ -1,0 +1,345 @@
+BIOKG biomedical knowledge graph
+All files are gzipped and tab seperated
+
+Metadata
+The metadata folder contains additional data about the entities in the BIOKG
+
+
+################################################################################
+# protein/uniprot_name.txt.gz                                                  #
+################################################################################
+
+# Description:
+Contains the primary name of each protein
+
+# Format:
+<uniprot_acc> NAME <name>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_fullname.txt.gz                                              #
+################################################################################
+
+# Description:
+Contains the full name of each protein
+
+# Format:
+<uniprot_acc> FULL_NAME <name>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_shortname.txt.gz                                              #
+################################################################################
+
+# Description:
+Contains the short name of each protein
+
+# Format:
+<uniprot_acc> SHORT_NAME <name>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_organism_class.txt.gz                                        #
+################################################################################
+
+# Description:
+Contains the organism classes of each protein
+
+# Format:
+<uniprot_acc> ORGANISM_CLASS <class>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_fullname.txt.gz                                              #
+################################################################################
+
+# Description:
+Contains the species of each protein
+
+# Format:
+<uniprot_acc> SPECIES <species>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_other_ids.txt.gz                                             #
+################################################################################
+
+# Description:
+Contains the alternative id of each protein
+
+# Format:
+<uniprot_acc> OTHER_ID <id>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_related_keywords.txt.gz                                      #
+################################################################################
+
+# Description:
+Contains keywords related to each protein
+
+# Format:
+<uniprot_acc> RELATED_KEYWORD <keyword>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/uniprot_related_pubmed_ids.txt.gz                                    #
+################################################################################
+
+# Description:
+Contains pubmed ids related to each protein
+
+# Format:
+<uniprot_acc> RELATED_PUBMED_ID <pubmed_id>
+
+# Sources:
+Uniprot
+
+################################################################################
+# protein/protein_expression_level.txt.gz                                      #
+################################################################################
+
+# Description:
+Contains the tissue each protein is expressed in along with the level
+
+# Format:
+<uniprot_acc>  PROTEIN_EXPRESSED_IN <hpa_tissue>    <LOW|MEDIUM|HIGH>
+
+# Sources:
+HPA
+
+################################################################################
+# drug/drugbank_name.txt.gz                                                #
+################################################################################
+
+# Description:
+Contains the name of drugbank drugs
+
+# Format:
+<drug_id>  NAME <name>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_synonym.txt.gz                                             #
+################################################################################
+
+# Description:
+Contains the synonyms of drugbank drugs
+
+# Format:
+<drug_id>  SYNONYM <synonym>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_type.txt.gz                                                #
+################################################################################
+
+# Description:
+Contains the type of drugbank drugs
+
+# Format:
+<drug_id>  TYPE <type>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_product.txt.gz                                             #
+################################################################################
+
+# Description:
+Contains the product names of drugbank drugs
+
+# Format:
+<drug_id>  PRODUCT <product_name>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_product_stage.txt.gz                                       #
+################################################################################
+
+# Description:
+Contains the product stages of drugbank drugs
+
+# Format:
+<drug_id>  PRODUCT_STAGE <stage>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_class.txt.gz                                               #
+################################################################################
+
+# Description:
+Contains the class of drugbank drugs
+
+# Format:
+<drug_id>  CLASS <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_direct_parent.txt.gz                                       #
+################################################################################
+
+# Description:
+Contains the direct parent class of drugbank drugs
+
+# Format:
+<drug_id>  DIRECT_PARENT <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_alternative_parent.txt.gz                                  #
+################################################################################
+
+# Description:
+Contains alternative parent classes of drugbank drugs
+
+# Format:
+<drug_id>  ALTERNATIVE_PARENT <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_superclass.txt.gz                                          #
+################################################################################
+
+# Description:
+Contains superclass of drugbank drugs
+
+# Format:
+<drug_id>  SUPERCLASS <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_subclass.txt.gz                                            #
+################################################################################
+
+# Description:
+Contains the subclass of drugbank drugs
+
+# Format:
+<drug_id>  SUBCLASS <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_substituent.txt.gz                                         #
+################################################################################
+
+# Description:
+Contains the substituents of drugbank drugs
+
+# Format:
+<drug_id>  SUBSTITUENT <class>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_kingdom.txt.gz                                             #
+################################################################################
+
+# Description:
+Contains the kingdom of drugbank drugs
+
+# Format:
+<drug_id>  KINGDOM <kingdom>
+
+# Sources:
+Drugbank
+
+################################################################################
+# drug/drugbank_related_pubmed_ids.txt.gz                                  #
+################################################################################
+
+# Description:
+Contains pubmed ids related to drugbank drugs
+
+# Format:
+<drug_id>  PUBMED_ARTICLE <pubmed_id>
+
+# Sources:
+Drugbank
+
+################################################################################
+# disease/mesh_name.txt.gz                                                        #
+################################################################################
+
+# Description:
+Contains name of mesh dieases and disease supplementary records
+
+# Format:
+<mesh_id>  NAME <name>
+
+# Sources:
+MeSH
+
+################################################################################
+# disease/mesh_type.txt.gz                                                        #
+################################################################################
+
+# Description:
+Contains type of mesh dieases and disease supplementary records
+
+# Format:
+<mesh_id>  TYPE <DISEASE|SCR_DISEASE>
+
+# Sources:
+MeSH
+
+################################################################################
+# pathway/pathway_names.txt.gz                                                 #
+################################################################################
+
+# Description:
+Contains Reactome and KEGG pathway names
+
+# Format:
+<pathway>  NAME <name>
+
+# Sources:
+Reactome
+KEGG
+
+################################################################################
+# cell/cell_names.txt.gz                                                       #
+################################################################################
+
+# Description:
+Contains cellosaurus cell line names
+
+# Format:
+<cell_id>  NAME <name>
+
+# Sources:
+Cellosaurus
