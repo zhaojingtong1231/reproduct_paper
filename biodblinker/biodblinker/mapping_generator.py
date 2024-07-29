@@ -1008,12 +1008,12 @@ class MappingGenerator():
             drugbank password
         """
         self.generate_cellosaurus_mappings()
-        # self.generate_hpa_mappings()
-        # self.generate_sider_mappings()
-        # self.generate_kegg_mappings()
-        # self.generate_drugbank_mappings(drugbank_user, drugbank_password)
-        # self.generate_uniprot_mappings()
-        # if delete_sources:
-        #     self._clear_sources()
-        # self.compress_mappings()
-        # write_mappings_config()
+        self.generate_hpa_mappings()
+        self.generate_sider_mappings()
+        self.generate_kegg_mappings()
+        self.generate_drugbank_mappings(drugbank_user, drugbank_password)
+        self.generate_uniprot_mappings()
+        if delete_sources:
+            self._clear_sources()
+        self.compress_mappings()
+        write_mappings_config()
