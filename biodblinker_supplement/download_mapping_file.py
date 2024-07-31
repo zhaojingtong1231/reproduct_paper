@@ -77,7 +77,7 @@ def download_all_files(source_id,target_ids,id_name_map):
 
     for url,fileneme in zip(urls, filenames):
         try:
-            local_path = download_file(url, '/project/reproduct_paper/biodblinker_supplement/drug_data/'+fileneme)
+            local_path = download_file(url, '/project/reproduct_paper/biodblinker_supplement/drug_mapping_supplement_data/'+fileneme)
             print(local_path)
         except Exception as e:
             print(e)
