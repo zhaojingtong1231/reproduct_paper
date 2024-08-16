@@ -86,6 +86,7 @@ def download_all_files(source_id,target_ids,id_name_map):
 if __name__ == '__main__':
 
     source_id = 2
-    target_ids = [31, 14, 6, 3, 17, 47, 37]
-    id_name_map= {31:'bindingdb',14:'faers',6:'kegg compounds',3:'pdb',17:'pharmgkb',47:'rxnorm',37:'brenda'}
+    target_ids = [31, 14, 3, 17, 47, 37, 22]
+    id_name_map = {31: 'bindingdb', 14: 'faers', 3: 'pdb', 17: 'pharmgkb', 47: 'rxnorm', 37: 'brenda',
+                   22: 'pubchem_compound'}
     download_all_files(source_id,target_ids,id_name_map)

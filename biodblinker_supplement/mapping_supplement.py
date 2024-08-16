@@ -9,8 +9,8 @@ import gzip
 import pandas as pd
 import shutil
 source_id = 2
-target_ids = [31, 14,  3, 17, 47, 37]
-id_name_map = {31: 'bindingdb', 14: 'faers', 3: 'pdb', 17: 'pharmgkb', 47: 'rxnorm', 37: 'brenda'}
+target_ids = [31, 14,  3, 17, 47, 37,22]
+id_name_map = {31: 'bindingdb', 14: 'faers', 3: 'pdb', 17: 'pharmgkb', 47: 'rxnorm', 37: 'brenda',22:'pubchem_compound'}
 
 filename_template = "drugbank_to_{db_name}.txt.gz"
 # 生成URL列表
@@ -46,7 +46,7 @@ for filename in filenames:
 
     merged_data = pd.merge(mapping_data, supplement_data, on='drugbank', how='left')
     merged_data.fillna(-1, inplace=True)
-    if filename == 'drugbank_to_bindingdb.txt.gz':
+    if filename == 'drugbank_to_bindingdb.txt.gz' or filename=='drugbank_to_pubchem_compound.txt.gz':
         merged_data['target_db2'] = merged_data['target_db2'].astype(int)
     merged_data['target_db1'] = merged_data.apply(lambda row: row['target_db2'] if row['target_db1'] == '-' and row['target_db2']!=-1 else row['target_db1'], axis=1)
     end_merged_data  = merged_data[['drugbank','target_db1']]
