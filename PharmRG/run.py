@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(
     description="Knowledge Graph Embedding"
 )
 parser.add_argument(
-    "--dataset", default="PharmRG_Lite", choices=["FB15K", "WN", "WN18RR", "FB237", "YAGO3-10",'PharmRG_Lite','PharmKG'],
+    "--dataset", default="PharmRG", choices=["FB15K", "WN", "WN18RR", "FB237", "YAGO3-10",'PharmRG_Lite','PharmKG','PharmRG'],
     help="Knowledge Graph dataset"
 )
 parser.add_argument(
@@ -38,6 +38,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--patience", default=10, type=int, help="Number of epochs before early stopping"
+)
+parser.add_argument(
+    "--valid", default=3, type=float, help="Number of epochs before validation"
 )
 parser.add_argument(
     "--test", default=1, type=float, help="Number of epochs before validation"
