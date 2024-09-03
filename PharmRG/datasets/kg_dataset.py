@@ -21,7 +21,7 @@ class KGDataset(object):
         self.data_path = data_path
         self.debug = debug
         self.data = {}
-        for split in ["train", "test", "test"]:
+        for split in ["train", "valid", "test"]:
             file_path = os.path.join(self.data_path, split + ".pickle")
             with open(file_path, "rb") as in_file:
                 self.data[split] = pkl.load(in_file)

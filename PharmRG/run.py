@@ -112,7 +112,7 @@ def train(args):
     # load data
     logging.info("\t " + str(dataset.get_shape()))
     train_examples = dataset.get_examples("train")
-    valid_examples = dataset.get_examples("test")
+    valid_examples = dataset.get_examples("valid")
     test_examples = dataset.get_examples("test")
     filters = dataset.get_filters()
 

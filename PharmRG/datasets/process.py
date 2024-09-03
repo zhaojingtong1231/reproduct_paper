@@ -17,7 +17,7 @@ def get_idx(path):
       rel2idx: Dictionary mapping raw relations to unique ids
     """
     entities, relations = set(), set()
-    for split in ["train", "test", "test"]:
+    for split in ["train", "valid", "test"]:
         with open(os.path.join(path, split), "r") as lines:
             for line in lines:
                 lhs, rel, rhs = line.strip().split("\t")
@@ -88,7 +88,7 @@ def process_dataset(path):
     """
     ent2idx, rel2idx = get_idx(dataset_path)
     examples = {}
-    splits = ["train", "test", "test"]
+    splits = ["train", "valid", "test"]
     for split in splits:
         dataset_file = os.path.join(path, split)
         examples[split] = to_np_array(dataset_file, ent2idx, rel2idx)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     dataset_name = 'PharmRG'
     dataset_path = os.path.join(data_path, dataset_name)
     dataset_examples, dataset_filters = process_dataset(dataset_path)
-    for dataset_split in ["train", "test", "test"]:
+    for dataset_split in ["train", "valid", "test"]:
         save_path = os.path.join(dataset_path, dataset_split + ".pickle")
         with open(save_path, "wb") as save_file:
             pickle.dump(dataset_examples[dataset_split], save_file)
