@@ -9,8 +9,11 @@ class PrePrompt(nn.Module):
     def __init__(self, n_in, n_h, activation,sample,a1,a2,a3,a4,num_layers_num,p):
         super(PrePrompt, self).__init__()
         self.dgi = DGI(n_in, n_h, activation)
+
         self.graphcledge = GraphCL(n_in, n_h, activation)
+
         self.lp = Lp(n_in, n_h)
+
         self.gcn = GcnLayers(n_in, n_h,num_layers_num,p)
         self.read = AvgReadout()
 
@@ -39,6 +42,7 @@ class PrePrompt(nn.Module):
         seq3 = torch.squeeze(seq3,0)
         seq4 = torch.squeeze(seq4,0)
         logits1 = self.dgi(self.gcn, seq1, seq2, adj, sparse, msk, samp_bias1, samp_bias2)
+
         logits2 = self.graphcledge(self.gcn, seq1, seq2, seq3, seq4, adj, aug_adj1edge, aug_adj2edge, sparse, msk,
                                    samp_bias1,
                                    samp_bias2, aug_type='edge')
@@ -46,9 +50,11 @@ class PrePrompt(nn.Module):
         
         
         logits4 = self.dgiprompt(self.gcn, seq1, seq2, adj, sparse, msk, samp_bias1, samp_bias2)
+
         logits5 = self.graphcledgeprompt(self.gcn, seq1, seq2, seq3, seq4, adj, aug_adj1edge, aug_adj2edge, sparse, msk,
                                    samp_bias1,
                                    samp_bias2, aug_type='edge')
+
         logits6 = self.lpprompt(self.gcn,seq1,adj,sparse)
         # print("logits1=",logits1)
         # print("logits2=",logits2)

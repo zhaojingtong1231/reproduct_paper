@@ -45,7 +45,7 @@ torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 # torch.cuda.set_device(int(local_rank))
 device_ids = [0, 1, 2, 3]
-from torch_geometric.datasets import TUDataset
+from torch_geometric.datasets import TUDataset,Planetoid
 from torch_geometric.loader import DataLoader
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data.distributed import DistributedSampler
@@ -53,13 +53,13 @@ import torch.distributed as dist
 # training params
 
 # idx_train = torch.load("data/fewshot/0/idx.pt").type(torch.long).cuda()
-batch_size = 16
+batch_size = 64
 nb_epochs = 1000
 patience = 10
 lr = 0.0001
 l2_coef = 0.0
 drop_prob = 0.0
-hid_units = 256
+hid_units = 512
 sparse = False
 useMLP =False
 class_num = 3
@@ -68,7 +68,8 @@ LP = False
 
 nonlinearity = 'prelu'  # special name to separate parameters
 
-dataset = TUDataset(root='data', name='ENZYMES',use_node_attr=True)                                                                                                
+dataset = TUDataset(root='data', name='ENZYMES',use_node_attr=True)
+# dataset = Planetoid(root='data/Planetoid', name='Cora')
 loader = DataLoader(dataset,batch_size=batch_size,shuffle=True,drop_last=True)
 a1 = 0.9    #dgi
 a2 = 0.9    #graphcl
@@ -88,6 +89,7 @@ for epoch in range(nb_epochs):
     loss = 0
     regloss = 0
     for step, data in enumerate(loader):
+        print(step)
         features,adj,nodelabels= process.process_tu(data,ft_size)
 
         negetive_sample = preprompt.prompt_pretrain_sample(adj,100)
@@ -192,7 +194,7 @@ for epoch in range(nb_epochs):
         best = loss
         best_t = epoch
         cnt_wait = 0
-        torch.save(model.state_dict(), args.save_name)
+        # torch.save(model.state_dict(), args.save_name)
     else:
         cnt_wait += 1
     if cnt_wait == patience:

@@ -19,7 +19,7 @@ parser.add_argument('--aug_type', type=str, default="edge", help='aug type: mask
 parser.add_argument('--drop_percent', type=float, default=0.1, help='drop percent')
 parser.add_argument('--seed', type=int, default=39, help='seed')
 parser.add_argument('--gpu', type=int, default=1, help='gpu')
-parser.add_argument('--save_name', type=str, default='modelset/cora.pkl', help='save ckpt name')
+parser.add_argument('--save_name', type=str, default='../modelset/cora.pkl', help='save ckpt name')
 
 args = parser.parse_args()
 
@@ -244,8 +244,10 @@ for lr in list2:
                     train_lbls = torch.load("data/fewshot_cora/{}-shot_cora/{}/labels.pt".format(shotnum,i)).type(torch.long).squeeze().cuda()
                     print("true",i,train_lbls)
                     feature_prompt=featureprompt(model.dgiprompt.prompt,model.graphcledgeprompt.prompt,model.lpprompt.prompt).cuda()
+
                     log = downprompt(dgiprompt, graphcledgeprompt, lpprompt,a4, hid_units, nb_classes,embeds,train_lbls)
                     # opt = torch.optim.Adam(log.parameters(),downstreamprompt.parameters(),lr=0.01, weight_decay=0.0)
+
                     opt = torch.optim.Adam([*log.parameters(),*feature_prompt.parameters()], lr=0.001)
                     # opt = torch.optim.Adam(log.parameters(), lr=0.001)
                     log.cuda()
@@ -271,7 +273,7 @@ for lr in list2:
                             best = loss
                             # best_t = epoch
                             cnt_wait = 0
-                            # torch.save(model.state_dict(), args.save_name)
+                            torch.save(model.state_dict(), args.save_name)
                         else:
                             cnt_wait += 1
                         if cnt_wait == patience:
