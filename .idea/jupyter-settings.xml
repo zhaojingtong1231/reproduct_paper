@@ -11,6 +11,15 @@
             </JupyterConnectionParameters>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/.idea/reproduct_paper.iml">
+          <value>
+            <JupyterConnectionParameters>
+              <option name="argv" value="notebook --no-browser --allow-root" />
+              <option name="managed" value="true" />
+              <option name="sdkName" value="" />
+            </JupyterConnectionParameters>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

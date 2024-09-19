@@ -9,8 +9,7 @@ def main():
     pass
 
 
-def \
-        aug_random_mask(input_feature, drop_percent=0.2):
+def aug_random_mask(input_feature, drop_percent=0.2):
     
     node_num = input_feature.shape[1]
     mask_num = int(node_num * drop_percent)
@@ -135,21 +134,6 @@ def delete_row_col(input_matrix, drop_list, only_row=False):
     out = out[:, remain_list]
 
     return out
-
-
-
-    
-
-
-
-    
-
-     
-
-    
-
-
-
 
 
 
