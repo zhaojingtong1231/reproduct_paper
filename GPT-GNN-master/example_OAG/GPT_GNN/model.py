@@ -43,6 +43,7 @@ class GPT_GNN(nn.Module):
         
     def forward(self, node_feature, node_type, edge_time, edge_index, edge_type):
         return self.gnn(node_feature, node_type, edge_time, edge_index, edge_type)
+
     def link_loss(self, node_emb, rem_edge_list, ori_edge_list, node_dict, target_type, use_queue = True, update_queue = False):
         losses = 0
         ress   = []

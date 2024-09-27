@@ -18,9 +18,9 @@ class GraphCL(nn.Module):
     def forward(self, gcn, seq1, seq2, seq3, seq4, adj, aug_adj1, aug_adj2, sparse, msk, samp_bias1, samp_bias2,
                 aug_type):
 
-        h_0 = gcn(seq1, adj, sparse)#(1,2708,256)
+        h_0 = gcn(seq1, adj, sparse)
 
-        h_00 = h_0 * self.prompt #(1,2708,256)
+        h_00 = h_0 * self.prompt
         if aug_type == 'edge':
 
             h_1 = gcn(seq1, aug_adj1, sparse)
