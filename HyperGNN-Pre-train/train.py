@@ -5,24 +5,18 @@
   @Email: 2665109868@qq.com
   @function
 """
-import torch
 
 import numpy as np
-import scipy.sparse as sp
 import random
-from preprompt import PrePrompt
-import preprompt
-from utils import process
-
-import torch.nn as nn
-import torch.nn.functional as F
+from pretrain import Pretrain
 import aug
 import os
 import argparse
-from torch_geometric.datasets import OGB_MAG
-from torch_geometric.loader import NeighborSampler
 import torch
 
+
+gpu_id = 1  # 选择你想使用的 GPU ID，例如 0, 1, 2 等
+device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
 
 save_path = '/data/zhaojingtong/pharmrgdata/hetero_graph.pt'
 data = torch.load(save_path)
@@ -60,7 +54,7 @@ patience = 20
 lr = 0.0001
 l2_coef = 0.0
 drop_prob = 0.0
-hid_units = 256
+hidden_dim = 512
 sparse = True
 useMLP = False
 
@@ -73,16 +67,18 @@ aug_features1edge = data
 aug_features2edge = data
 
 # 边数据增强
-# aug1edge_index1 = aug.aug_heterodata_random_edge_edge_index(data, drop_percent=0.2)
-# aug1edge_index2 = aug.aug_heterodata_random_edge_edge_index(data, drop_percent=0.2)
+# aug1edge_index1 = data
+aug1edge_index1 = aug.aug_heterodata_random_edge_edge_index(data, drop_percent=0.2)
+aug1edge_index2 = aug.aug_heterodata_random_edge_edge_index(data, drop_percent=0.2)
 
 #节点特征掩码
 aug_feature1 = aug.aug_heterodata_random_mask(data,drop_percent=0.2)
 aug_feature1 = aug.aug_heterodata_random_mask(data,drop_percent=0.2)
 
-
-from models import DGI_heter, GraphCL, Lp,GcnLayers,DGIprompt,GraphCLprompt,Lpprompt
 from models import HeteroConvLayers
+
+neg_data,labels = aug.generate_hetero_shuf_features_and_labels(data)
+
 
 msk  =None
 samp_bias1 = None
@@ -90,19 +86,65 @@ samp_bias2 = None
 hidden_dim = 128
 num_layers_num = 1
 dropout = 0.1
-data = data.cuda()
-aug_features1edge = aug_features1edge.cuda()
-aug_features2edge = aug_features2edge.cuda()
+data = data.to(device)
+neg_data = neg_data.to(device)
 
+aug_features1edge = aug_features1edge.to(device)
+aug_features2edge = aug_features2edge.to(device)
 
 hetero_conv = HeteroConvLayers( hidden_dim,num_layers_num,dropout)
-hetero_conv = hetero_conv.cuda()
+hetero_conv = hetero_conv.to(device)
+model = Pretrain(hidden_dim=hidden_dim,device=device)
+model= model.to(device)
 
-dgi = DGI_heter()
-dgi = dgi.cuda()
-logits_dgi = dgi(hetero_conv,data, aug_features1edge, aug_features2edge, msk, samp_bias1, samp_bias2)
-# print(logits_dgi['Drug'].shape)
+optimiser = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=l2_coef)
+for epoch in range(1000):
+    optimiser.zero_grad()
+    loss = model(hetero_conv,data,neg_data, aug_features1edge, aug_features2edge,
+                    data,aug1edge_index1,aug1edge_index2,msk, samp_bias1, samp_bias2,aug_type='edge',labels = labels)
+    loss.backward()
+    optimiser.step()
 
+    print(loss.item())
+# loss = nn.BCEWithLogitsLoss()
+#
+# def Heter_BCEWithLogitsLoss(logits,labels):
+#     total_loss = 0
+#     for node_type in logits.keys():
+#         # 获取当前节点类型的预测值（logits）和对应的标签
+#         logit = logits[node_type]  # shape: [num_nodes, out_features]
+#         label = labels[node_type]  # shape: [num_nodes, out_features]
+#
+#         label = label.to(device)
+#         # logits.to(device)
+#         # labels.to(device)
+#         # 计算当前节点类型的损失
+#         node_loss = loss(logit, label)
+#         # 累加各节点类型的损失
+#         total_loss += node_loss
+#     return total_loss
+#
+#
+# hetero_conv = HeteroConvLayers( hidden_dim,num_layers_num,dropout)
+# hetero_conv = hetero_conv.to(device)
+#
+# dgi = DGI_heter(hidden_dim=hidden_dim)
+# dgi = dgi.to(device)
+# logits_dgi = dgi(hetero_conv,data,neg_data, aug_features1edge, aug_features2edge, msk, samp_bias1, samp_bias2)
+#
+#
+# graphcledge = GraphCL_heter(hidden_dim=hidden_dim)
+# graphcledge = graphcledge.to(device)
+# logits_graphcl = graphcledge(hetero_conv,data,neg_data, aug_features1edge, aug_features2edge,data,aug1edge_index1,aug1edge_index1,msk, samp_bias1, samp_bias2,aug_type='edge',labels= labels)
+#
+# Lp_heter =Lp_heter(hidden_dim=hidden_dim)
+# Lp_heter = Lp_heter.to(device)
+# logits_lp = Lp_heter(hetero_conv,data)
+#
+# dgiloss = Heter_BCEWithLogitsLoss(logits_dgi,labels)
+# graphclloss = Heter_BCEWithLogitsLoss(logits_graphcl,labels)
+# print(dgiloss)
+# print(graphclloss)
 
 # LP = False
 #

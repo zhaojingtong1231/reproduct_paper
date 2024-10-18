@@ -15,7 +15,35 @@ import copy
 import numpy as np
 import scipy.sparse as sp
 
+def generate_hetero_shuf_features_and_labels(data):
+    neg_data = copy.deepcopy(data)
+    # 存放不同节点类型的正负样本特征及标签
+    pos_features = {}
+    neg_features = {}
+    labels = {}
 
+    # 遍历 HeteroData 中的所有节点类型
+    for node_type in data.node_types:
+        # 提取节点特征
+        features = data[node_type].x  # 节点特征张量，形状 [num_nodes, feature_dim]
+        nb_nodes = features.size(0)          # 节点数量
+
+        # 生成随机打乱的负样本特征
+        idx = np.random.permutation(nb_nodes)
+        shuf_fts = features[idx, :]  # 随机打乱后的特征
+
+        # 生成正负样本特征字典
+        neg_features[node_type] = shuf_fts
+
+        # 创建正负样本标签
+        lbl_1 = torch.ones(1,nb_nodes)  # 正样本标签，全 1
+        lbl_2 = torch.zeros(1,nb_nodes) # 负样本标签，全 0
+
+        # 合并正负样本标签
+        labels[node_type] = torch.cat((lbl_1, lbl_2), 1)  # 拼接标签
+    neg_data.x_dict = neg_features
+
+    return  neg_data, labels
 def heterodata_preprocess_features(data):
     hererodata_feature_dict = {}
     input_feature_dict = data.x_dict

@@ -10,6 +10,29 @@ from dgl.nn.pytorch.conv import RelGraphConv
 import numpy as np
 import tqdm
 
+class Lp_heter(nn.Module):
+    def __init__(self,  hidden_dim):
+        super(Lp_heter, self).__init__()
+        self.sigm = nn.ELU()
+        self.act=torch.nn.LeakyReLU()
+        # self.dropout=torch.nn.Dropout(p=config["dropout"])
+        self.prompt = nn.Parameter(torch.FloatTensor(1, hidden_dim), requires_grad=True)
+
+        self.reset_parameters()
+
+
+
+    def forward(self,hetero_conv,seq):
+        h_1 = hetero_conv(seq,LP=False)
+
+
+        ret = {key: h * self.prompt for key, h in h_1.items()}
+
+        ret = {key: self.sigm(c_val.squeeze(dim=0)) for key, c_val in ret.items()}
+        return ret
+
+    def reset_parameters(self):
+        torch.nn.init.xavier_uniform_(self.prompt)
 class Lp(nn.Module):
     def __init__(self, n_in, n_h):
         super(Lp, self).__init__()

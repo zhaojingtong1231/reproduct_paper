@@ -42,7 +42,7 @@ torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 
 batch_size = 1
-nb_epochs = 1000
+nb_epochs = 100000
 patience = 20
 lr = 0.0001
 l2_coef = 0.0
@@ -56,7 +56,7 @@ adj, features, labels, idx_train, idx_val, idx_test = process.load_data(dataset)
 
 features, _ = process.preprocess_features(features)
 negetive_sample = preprompt.prompt_pretrain_sample(adj,200)
-
+print(negetive_sample.shape)
 nb_nodes = features.shape[0]  # node number
 ft_size = features.shape[1]  # node features dim
 nb_classes = labels.shape[1]  # classes = 6
