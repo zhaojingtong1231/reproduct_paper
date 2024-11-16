@@ -32,12 +32,12 @@ warnings.filterwarnings("ignore")
 torch.manual_seed(0)
 #device = torch.device("cuda:0")
 
-class TxGNN:
+class TxGNNPrompt:
     
     def __init__(self, data,
                        weight_bias_track = False,
-                       proj_name = 'TxGNN',
-                       exp_name = 'TxGNN',
+                       proj_name = 'TxGNNPrompt',
+                       exp_name = 'TxGNNPrompt',
                        device = 'cuda:0'):
         self.device = torch.device(device)
         self.weight_bias_track = weight_bias_track
@@ -70,7 +70,7 @@ class TxGNN:
                                n_out = 128, 
                                proto = True,
                                proto_num = 5,
-                               attention = False,
+                               attention = True,
                                sim_measure = 'all_nodes_profile',
                                bert_measure = 'disease_name',
                                agg_measure = 'rarity', 
@@ -179,16 +179,15 @@ class TxGNN:
                 if self.weight_bias_track:
                     self.wandb.log({"Pretraining Loss": loss})
                 if (step) % train_print_per_n == 0:
-                    print(epoch)
-                    print(loss.item())
                     # validation tracking...
                     # print('Validation.....')
                     # (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc), loss = evaluate_fb(
                     #     self.model, self.g_test_pos, self.g_test_neg, self.G, self.dd_etypes, self.device,
                     #     mode='valid')
                     # print(
-                    #     'Epoch: %d LR: %.5f Validation Loss %.4f,  Validation Micro AUROC %.4f Validation Micro AUPRC %.4f Validation Macro AUROC %.4f Validation Macro AUPRC %.4f ' % (
+                    #     'Epoch: %d Step %d LR: %.5f Validation Loss %.4f,  Validation Micro AUROC %.4f Validation Micro AUPRC %.4f Validation Macro AUROC %.4f Validation Macro AUPRC %.4f ' % (
                     #         epoch,
+                    #         step,
                     #         optimizer.param_groups[0]['lr'],
                     #         loss,
                     #         micro_auroc,
@@ -196,6 +195,7 @@ class TxGNN:
                     #         macro_auroc,
                     #         macro_auprc
                     #     ))
+                    print('epoch %d , step %d' % (epoch, step))
                     (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
                      macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
                                                                           self.g_test_neg, self.G, self.dd_etypes,
@@ -239,7 +239,7 @@ class TxGNN:
                 #         macro_auprc
                 #     ))
         # self.best_model = copy.deepcopy(self.model)
-        
+
     def finetune(self, n_epoch = 500, 
                        learning_rate = 1e-3, 
                        train_print_per_n = 5, 
@@ -263,6 +263,8 @@ class TxGNN:
             pos_score = torch.cat([pred_score_pos[i] for i in self.dd_etypes])
             neg_score = torch.cat([pred_score_neg[i] for i in self.dd_etypes])
 
+
+
             scores = torch.sigmoid(torch.cat((pos_score, neg_score)).reshape(-1,))
             labels = [1] * len(pos_score) + [0] * len(neg_score)
             loss = F.binary_cross_entropy(scores, torch.Tensor(labels).float().to(self.device))
@@ -274,30 +276,30 @@ class TxGNN:
             if self.weight_bias_track:
                 self.wandb.log({"Training Loss": loss})
 
-            if epoch % train_print_per_n == 0:
-                # training tracking...
-                auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc = get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, self.G, True)
-
-                if self.weight_bias_track:
-                    temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Training")
-                    temp_d.update({"LR": optimizer.param_groups[0]['lr']})
-                    self.wandb.log(temp_d)
-
-                print('Epoch: %d LR: %.5f Loss %.4f, Train Micro AUROC %.4f Train Micro AUPRC %.4f Train Macro AUROC %.4f Train Macro AUPRC %.4f' % (
-                    epoch,
-                    optimizer.param_groups[0]['lr'], 
-                    loss.item(),
-                    micro_auroc,
-                    micro_auprc,
-                    macro_auroc,
-                    macro_auprc
-                ))
-
-                print('----- AUROC Performance in Each Relation -----')
-                print_dict(auroc_rel)
-                print('----- AUPRC Performance in Each Relation -----')
-                print_dict(auprc_rel)
-                print('----------------------------------------------')
+            # if epoch % train_print_per_n == 0:
+            #     # training tracking...
+            #     auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc = get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, self.G, True)
+            #
+            #     if self.weight_bias_track:
+            #         temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Training")
+            #         temp_d.update({"LR": optimizer.param_groups[0]['lr']})
+            #         self.wandb.log(temp_d)
+            #
+            #     print('Epoch: %d LR: %.5f Loss %.4f, Train Micro AUROC %.4f Train Micro AUPRC %.4f Train Macro AUROC %.4f Train Macro AUPRC %.4f' % (
+            #         epoch,
+            #         optimizer.param_groups[0]['lr'],
+            #         loss.item(),
+            #         micro_auroc,
+            #         micro_auprc,
+            #         macro_auroc,
+            #         macro_auprc
+            #     ))
+            #
+            #     print('----- AUROC Performance in Each Relation -----')
+            #     print_dict(auroc_rel)
+            #     print('----- AUPRC Performance in Each Relation -----')
+            #     print_dict(auprc_rel)
+            #     print('----------------------------------------------')
 
             del pred_score_pos, pred_score_neg, scores, labels
 
@@ -308,7 +310,7 @@ class TxGNN:
 
                 if best_val_acc < macro_auroc:
                     best_val_acc = macro_auroc
-                    self.best_model = copy.deepcopy(self.model)
+                    # self.best_model = copy.deepcopy(self.model)
 
                 print('Epoch: %d LR: %.5f Validation Loss %.4f,  Validation Micro AUROC %.4f Validation Micro AUPRC %.4f Validation Macro AUROC %.4f Validation Macro AUPRC %.4f (Best Macro AUROC %.4f)' % (
                     epoch,

@@ -8,10 +8,12 @@ from scipy.sparse.linalg import eigsh
 import sys
 import torch
 import torch.nn as nn
-import tqdm
+from tqdm import tqdm
+from torch_geometric.data import HeteroData
 import pandas as pd
 from data_splits.datasplit import DataSplitter
-
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, average_precision_score
+import torch.nn as nn
 
 def parse_skipgram(fname):
     with open(fname) as f:
@@ -305,7 +307,6 @@ def preprocess_kg(path, split, test_size=0.05, one_hop=False, mask_ratio=0.1):
 
 # process data
 
-
 def preprocess_kg(path, split, test_size=0.05, one_hop=False, mask_ratio=0.1):
     if split in ['cell_proliferation', 'mental_health', 'cardiovascular', 'anemia', 'adrenal_gland', 'autoimmune',
                  'metabolic_disorder', 'diabetes', 'neurodigenerative']:
@@ -434,7 +435,8 @@ def reverse_rel_generation(df, df_valid, unique_rel):
         if i[0] != i[2]:
             # bi identity
             temp["relation"] = 'rev_' + i[1]
-        df_valid = df_valid.append(temp)
+        df_valid =  pd.concat([df_valid,temp])
+
     return df_valid.reset_index(drop=True)
 
 def create_fold_cv(df, split_num, num_splits):
@@ -523,9 +525,9 @@ def random_fold(df, fold_seed, frac):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac=val_frac / (1 - test_frac), replace=False, random_state=1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test)
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid,val])
+        df_test = pd.concat([df_test, test])
 
     return {'train': df_train.reset_index(drop=True),
             'valid': df_valid.reset_index(drop=True),
@@ -705,3 +707,63 @@ def disease_eval_fold(df, fold_seed, disease_idx):
     return {'train': df_train.reset_index(drop=True),
             'valid': df_valid.reset_index(drop=True),
             'test': df_test.reset_index(drop=True)}
+
+def create_pyg_graph(df_train, df):
+    unique_graph = df_train[['x_type', 'relation', 'y_type']].drop_duplicates()
+    pyg_data = HeteroData()
+
+    # 创建节点和边的数据
+    for i in unique_graph.values:
+        x_type, relation, y_type = i
+        edges = df_train[df_train.relation == relation][['x_idx', 'y_idx']].values.T
+        source_nodes = edges[0].astype(int)
+        target_nodes = edges[1].astype(int)
+
+        # 添加边
+        pyg_data[(x_type, relation, y_type)].edge_index = torch.tensor([source_nodes, target_nodes], dtype=torch.long)
+
+    # 找到每种类型节点的最大索引来定义节点数量
+    temp = dict(df.groupby('x_type')['x_idx'].max())
+    temp2 = dict(df.groupby('y_type')['y_idx'].max())
+    temp['effect/phenotype'] = 0.0  # 假设有 'effect/phenotype' 类型的节点
+
+    output = {}
+
+    for d in (temp, temp2):
+        for k, v in d.items():
+            output.setdefault(k, float('-inf'))
+            output[k] = max(output[k], v)
+
+    # 定义节点数量
+    for node_type, max_idx in output.items():
+        pyg_data[node_type].num_nodes = int(max_idx) + 1
+
+    return pyg_data
+
+def initialize_node_embedding(g, n_inp):
+    # initialize embedding xavier uniform
+    for ntype in g.node_types:
+
+        emb = nn.Parameter(torch.Tensor(g[ntype].num_nodes, n_inp), requires_grad = False)
+        nn.init.xavier_uniform_(emb)
+        g[ntype].x = emb
+    return g
+
+
+def evaluate_fb(model, g_pos, g_neg, G, dd_etypes, device, return_embed=False, mode='valid'):
+    model.eval()
+    pred_score_pos, pred_score_neg, pos_score, neg_score = model(G, g_neg, g_pos, pretrain_mode=False, mode=mode)
+
+    pos_score = torch.cat([pred_score_pos[i] for i in dd_etypes])
+    neg_score = torch.cat([pred_score_neg[i] for i in dd_etypes])
+
+    scores = torch.sigmoid(torch.cat((pos_score, neg_score)).reshape(-1, ))
+    labels = [1] * len(pos_score) + [0] * len(neg_score)
+    loss = F.binary_cross_entropy(scores, torch.Tensor(labels).float().to(device))
+
+    if return_embed:
+        return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels,
+                                  G, True), loss.item(), pred_score_pos, pred_score_neg
+    else:
+        return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels,
+                                  G, True), loss.item()

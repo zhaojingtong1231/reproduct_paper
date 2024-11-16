@@ -489,7 +489,7 @@ class HeteroRGCN(nn.Module):
         self.w_rels = nn.Parameter(torch.Tensor(len(G.canonical_etypes), out_size))
         nn.init.xavier_uniform_(self.w_rels, gain=nn.init.calculate_gain('relu'))
         rel2idx = dict(zip(G.canonical_etypes, list(range(len(G.canonical_etypes)))))
-               
+
         self.pred = DistMultPredictor(n_hid = hidden_size, w_rels = self.w_rels, G = G, rel2idx = rel2idx, proto = proto, proto_num = proto_num, sim_measure = sim_measure, bert_measure = bert_measure, agg_measure = agg_measure, num_walks = num_walks, walk_mode = walk_mode, path_length = path_length, split = split, data_folder = data_folder, exp_lambda = exp_lambda, device = device)
         self.attention = attention
         
@@ -497,17 +497,24 @@ class HeteroRGCN(nn.Module):
         self.out_size = out_size
         self.etypes = G.etypes
         self.device = device
+        self.prompt ={}
+        for ntype in G.ntypes:
+            self.prompt[ntype] = nn.Parameter(torch.FloatTensor(1, hidden_size), requires_grad=True).to(device)
+            torch.nn.init.xavier_uniform_(self.prompt[ntype])
         
     def forward_minibatch(self, pos_G, neg_G, blocks, G, mode = 'train', pretrain_mode = False):
         input_dict = blocks[0].srcdata['inp']
         h_dict = self.layer1(blocks[0], input_dict)
         h_dict = {k : F.leaky_relu(h) for k, h in h_dict.items()}
         h = self.layer2(blocks[1], h_dict)
-        
+
+        # h_1 = {key: h * self.prompt[key] for key, h in h.items()}
+
         scores, out_pos = self.pred(pos_G, G, h, pretrain_mode, mode = mode + '_pos', block = blocks[1])
         scores_neg, out_neg = self.pred(neg_G, G, h, pretrain_mode, mode = mode + '_neg', block = blocks[1])
         return scores, scores_neg, out_pos, out_neg
-        
+
+
     
     def forward(self, G, neg_G, eval_pos_G = None, return_h = False, return_att = False, mode = 'train', pretrain_mode = False):
         with G.local_scope():
@@ -521,7 +528,7 @@ class HeteroRGCN(nn.Module):
                 h_dict = self.layer1(G, input_dict)
                 h_dict = {k : F.leaky_relu(h) for k, h in h_dict.items()}
                 h = self.layer2(G, h_dict)
-
+            # h = {key: h * self.prompt[key] for key, h in h.items()}
             if return_h:
                 return h
 

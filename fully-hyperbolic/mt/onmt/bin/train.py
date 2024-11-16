@@ -195,7 +195,7 @@ class ErrorHandler(object):
 
 
 def _get_parser():
-    parser = ArgumentParser(description='train.py')
+    parser = ArgumentParser(description='train_node_loader.py')
 
     opts.config_opts(parser)
     opts.model_opts(parser)

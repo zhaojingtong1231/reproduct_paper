@@ -23,7 +23,11 @@ class Lp(nn.Module):
 
 
     def forward(self,gcn,seq,adj,sparse):
+
+
+
         h_1 = gcn(seq,adj,sparse,True)
+
         # ret = h_1
         ret = h_1 * self.prompt
         # ret = h_1 

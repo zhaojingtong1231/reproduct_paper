@@ -62,6 +62,7 @@ def heterodata_preprocess_features(data):
     return new_data
 
 def aug_random_edge_edge_index(edge_index, drop_percent=0.2):
+    print(edge_index.shape)
     edge_num = edge_index.shape[1]
     percent = drop_percent / 2
     add_drop_num = int(edge_num * percent)
@@ -107,9 +108,9 @@ def aug_random_edge_edge_index(edge_index, drop_percent=0.2):
 
 
 def aug_heterodata_random_edge_edge_index(hetero_data, drop_percent=0.2):
+
     for key in hetero_data.edge_types:
-        print('边数据增强')
-        print(key)
+
         edge_index = hetero_data[key]['edge_index']
         augmented_edge_index = aug_random_edge_edge_index(edge_index, drop_percent)
         hetero_data[key]['edge_index'] = augmented_edge_index  # 更新增强后的边索引

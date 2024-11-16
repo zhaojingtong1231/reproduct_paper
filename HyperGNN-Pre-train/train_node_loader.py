@@ -6,32 +6,37 @@
   @function
 """
 import csv
+from utils import process
 import numpy as np
 import torch.nn.functional as F
 import random
 from sklearn.metrics import average_precision_score
 from pretrain import Pretrain
 import aug
-from torch_geometric.loader import LinkNeighborLoader, HGTLoader
+from torch_geometric.loader import LinkNeighborLoader, HGTLoader,LinkLoader
 from torch_geometric.sampler import NeighborSampler,NegativeSampling
 from torch_geometric.utils import degree
 import os
+from PrimeKG import FullGraphNegSampler
 from tqdm import tqdm
 import argparse
 import torch
 from PrimeKG import PreData
 from utils import process
 
-gpu_id = 1  # 选择你想使用的 GPU ID，例如 0, 1, 2 等
+gpu_id = 0  # 选择你想使用的 GPU ID，例如 0, 1, 2 等
 device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
 
 # save_path = '/data/zhaojingtong/pharmrgdata/hetero_graph.pt'
 # data = torch.load(save_path)
 preData = PreData(data_folder_path='/data/zhaojingtong/PrimeKG/data_all/')
 g, df, df_train, df_valid, df_test, disease_eval_idx, no_kg ,g_valid_pos , g_valid_neg= preData.prepare_split(split='random', seed=42, no_kg=False)
-g = process.initialize_node_embedding(g,128)
-data = g
+# g = process.initialize_node_embedding(g,128)
+#
+# g_valid_pos = process.initialize_node_embedding(g_valid_pos,128)
 
+# data = g
+data = g_valid_pos
 
 parser = argparse.ArgumentParser("My DGI")
 
@@ -111,59 +116,54 @@ print('begin train ......')
 edge_types = data.edge_types
 g_valid_pos = g_valid_pos.to(device)
 g_valid_neg = g_valid_neg.to(device)
+
+
 # 开始训练并保存结果
 for epoch in range(epochs):
     print('epoch:' + str(epoch))
     epoch_results = [epoch]  # 当前 epoch 的结果
     loss_all =0
     auc_all =0
-
     for edge_type in edge_types:
         scores_list = []
         label_list = []
-
         all_loss = 0
         all_auc = 0
-        neg_sampling_config = NegativeSampling(
-            mode='triplet',  # 使用 binary 模式
-            dst_weight=torch.pow(degree(data[edge_type].edge_index[1]), 0.75).float().to(device)  # 转移到设备
-        )
-
-        loader = LinkNeighborLoader(
-            data,
+        pos_loader = LinkNeighborLoader(
+            g_valid_pos,
             num_neighbors=[60],  # 为每个关系采样邻居个数
             batch_size=batch_size,
-            edge_label_index=(edge_type, data[edge_type].edge_index),
-            neg_sampling=neg_sampling_config,
-            neg_sampling_ratio=1.0,  # 正负样本比例
-            edge_label=torch.ones(data[edge_type].edge_index.size(1), device=device)  # 转移到设备
+            edge_label_index=(edge_type, g_valid_pos[edge_type].edge_index)
+
         )
+        for pos_g in tqdm(pos_loader):
+            ng = FullGraphNegSampler(pos_g, k=1, method='multinomial_dst')
+            neg_g = ng(pos_g)
+            pred_score_pos, pred_score_neg = model.forword_minibatch(pos_g, neg_g,edge_type, pretrain_model=True)
 
-        for batch in tqdm(loader):
+            scores = torch.cat((pred_score_pos, pred_score_neg),dim=0)
+            labels = [1] * len(pred_score_pos) + [0] * len(pred_score_neg)
 
-            loss ,pre_score = model(data, neg_data, aug_features1edge, aug_features2edge,
-                                data, aug1edge_index1, aug1edge_index2, msk, samp_bias1, samp_bias2,
-                                aug_type='edge', labels=labels, edge_type=edge_type, batch=batch,lp=True)
-
+            loss = F.binary_cross_entropy(torch.sigmoid(scores), torch.Tensor(labels).float().to(device))
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            auc = average_precision_score(batch[edge_type]['edge_label'].cpu().detach().numpy(),
-                                          torch.sigmoid(pre_score).cpu().detach().numpy())
+            auc = average_precision_score(torch.Tensor(labels).cpu().detach().float(),
+                                          torch.sigmoid(scores).cpu().detach().numpy())
             all_loss += loss.item()
             all_auc += auc
-
             # print(loss.item(),auc)
 
 
-    #     print(all_loss / len(loader), all_auc / len(loader))
-    #     loss_all += all_loss / len(loader)
-    #     auc_all += all_auc / len(loader)
-    # print(loss_all/len(edge_types),auc_all/len(edge_types))
-        auc = model.predict(data, g_valid_pos, g_valid_neg,edge_types)
-        print('auc:', auc)
+        print(all_loss / len(pos_loader), all_auc / len(pos_loader))
+        loss_all += all_loss / len(pos_loader)
+        auc_all += all_auc / len(pos_loader)
+        all_result =  model.predict(g_valid_pos,g_valid_pos,g_valid_neg)
+        print(all_result)
+
+    print(loss_all/len(edge_types),auc_all/len(edge_types))
 
 
 

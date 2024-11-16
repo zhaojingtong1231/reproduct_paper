@@ -17,13 +17,13 @@ class GraphCL_heter(nn.Module):
     def forward(self, hetero_conv, seq1, seq2, seq3, seq4, data, aug1edge_index1, aug1edge_index2, msk, samp_bias1, samp_bias2,
                 aug_type):
 
-        h_0 = hetero_conv(seq1,LP=False)
+        h_0 = hetero_conv(seq1.x_dict, seq1.edge_index_dict, batch=None, edge_type=None, lp=False)
 
         h_00 = {key:h *self.prompt for key,h in h_0.items()}
         if aug_type == 'edge':
 
-            h_1 = hetero_conv(aug1edge_index1,LP=False)
-            h_3 = hetero_conv(aug1edge_index2,LP=False)
+            h_1 = hetero_conv(aug1edge_index1.x_dict, aug1edge_index1.edge_index_dict, batch=None, edge_type=None, lp=False)
+            h_3 = hetero_conv(aug1edge_index2.x_dict, aug1edge_index2.edge_index_dict, batch=None, edge_type=None,lp=False)
 
         elif aug_type == 'mask':
 

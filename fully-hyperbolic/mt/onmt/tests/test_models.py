@@ -13,7 +13,7 @@ from onmt.encoders.image_encoder import ImageEncoder
 from onmt.encoders.audio_encoder import AudioEncoder
 from onmt.utils.parse import ArgumentParser
 
-parser = ArgumentParser(description='train.py')
+parser = ArgumentParser(description='train_node_loader.py')
 onmt.opts.model_opts(parser)
 onmt.opts.train_opts(parser)
 

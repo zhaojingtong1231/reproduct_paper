@@ -1,38 +1,40 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import dgl
-import dgl.function as fn
-import copy
-from functools import partial
-from dgl.nn.pytorch.conv import RelGraphConv
-# from basemodel import GraphAdjModel
-import numpy as np
-import tqdm
+import torch.nn as nn
+from torch_geometric.loader import LinkNeighborLoader, HGTLoader
+from torch_geometric.sampler import NeighborSampler,NegativeSampling
+from torch_geometric.utils import degree
+from tqdm import tqdm
+from .Predictor import Predictor
 
 class Lp_heter(nn.Module):
-    def __init__(self,  hidden_dim):
+    def __init__(self, data,hidden_dim,batch_size,device):
         super(Lp_heter, self).__init__()
-        self.sigm = nn.ELU()
-        self.act=torch.nn.LeakyReLU()
-        # self.dropout=torch.nn.Dropout(p=config["dropout"])
-        self.prompt = nn.Parameter(torch.FloatTensor(1, hidden_dim), requires_grad=True)
+        self.w_rels = nn.Parameter(torch.Tensor(len(data.edge_types), hidden_dim))
 
-        self.reset_parameters()
+        rel2idx = dict(zip(data.edge_types, list(range(len(data.edge_types)))))
+        self.W = self.w_rels
+        self.batch_size = batch_size
+        self.rel2idx = dict(zip(data.edge_types, list(range(len(data.edge_types)))))
+        self.device = device
+
+        self.pred = Predictor(n_hid=hidden_dim,
+                                   w_rels=self.w_rels,G = data, rel2idx = rel2idx)
+
+    def forward(self,hetero_conv,batch,pretrain_model=False):
+
+        # h_1 = self.hetero_conv1(batch.x_dict, batch.edge_index_dict,batch,edge_type)
+        # h_1 = hetero_conv(batch.x_dict, batch.edge_index_dict)
+        h_1 = hetero_conv(batch)
+        # h_1 = hetero_conv(batch.x_dict, batch.edge_index_dict,batch,edge_type)
+
+        h1  = {key: F.leaky_relu(h[0])  for key, h in h_1.items()}
+
+        # out = self.pred(data,h1,pretrain_model,batch,edge_type)
+
+        return h1
 
 
-
-    def forward(self,hetero_conv,seq):
-        h_1 = hetero_conv(seq,LP=False)
-
-
-        ret = {key: h * self.prompt for key, h in h_1.items()}
-
-        ret = {key: self.sigm(c_val.squeeze(dim=0)) for key, c_val in ret.items()}
-        return ret
-
-    def reset_parameters(self):
-        torch.nn.init.xavier_uniform_(self.prompt)
 class Lp(nn.Module):
     def __init__(self, n_in, n_h):
         super(Lp, self).__init__()
