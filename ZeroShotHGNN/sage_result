@@ -1,0 +1,129 @@
+/root/miniconda3/envs/torch21/bin/python /z_work/code/reproduct_paper/ZeroShotHGNN/TxGNN_prompt.py
+Found local copy...
+Found local copy...
+Found local copy...
+Found saved processed KG... Loading...
+Splits detected... Loading splits....
+Creating DGL graph....
+Done!
+Creating minibatch pretraining dataloader...
+Start pre-training with #param: 53005825
+0.6956835985183716
+Testing Loss 0.6954 Testing Micro AUROC 0.5093 Testing Micro AUPRC 0.5092 Testing Macro AUROC 0.5094 Testing Macro AUPRC 0.5068
+{('disease', 'rev_contraindication', 'drug'): 0.520999289527466, ('disease', 'rev_indication', 'drug'): 0.5125761628023889, ('disease', 'rev_off-label use', 'drug'): 0.5079333512496641, ('drug', 'contraindication', 'disease'): 0.5081297452900584, ('drug', 'indication', 'disease'): 0.4899543525910435, ('drug', 'off-label use', 'disease'): 0.5170223058317657}
+{('disease', 'rev_contraindication', 'drug'): 0.5160170040445387, ('disease', 'rev_indication', 'drug'): 0.5147457458050676, ('disease', 'rev_off-label use', 'drug'): 0.5006682513950271, ('drug', 'contraindication', 'disease'): 0.5169002632866162, ('drug', 'indication', 'disease'): 0.4832639695961501, ('drug', 'off-label use', 'disease'): 0.5094874819633584}
+0.5351778268814087
+Testing Loss 0.6133 Testing Micro AUROC 0.7294 Testing Micro AUPRC 0.7128 Testing Macro AUROC 0.7096 Testing Macro AUPRC 0.6977
+{('disease', 'rev_contraindication', 'drug'): 0.6878401521943835, ('disease', 'rev_indication', 'drug'): 0.7334187295139657, ('disease', 'rev_off-label use', 'drug'): 0.6901209352324645, ('drug', 'contraindication', 'disease'): 0.7753259271086375, ('drug', 'indication', 'disease'): 0.7305021214985219, ('drug', 'off-label use', 'disease'): 0.6402257457672669}
+{('disease', 'rev_contraindication', 'drug'): 0.671456709365776, ('disease', 'rev_indication', 'drug'): 0.7366879344247355, ('disease', 'rev_off-label use', 'drug'): 0.6810753738715727, ('drug', 'contraindication', 'disease'): 0.7470468218759249, ('drug', 'indication', 'disease'): 0.7230493169427411, ('drug', 'off-label use', 'disease'): 0.6269119533992606}
+0.5054041743278503
+Testing Loss 0.5779 Testing Micro AUROC 0.7737 Testing Micro AUPRC 0.7559 Testing Macro AUROC 0.7765 Testing Macro AUPRC 0.7612
+{('disease', 'rev_contraindication', 'drug'): 0.7215766341715966, ('disease', 'rev_indication', 'drug'): 0.8145432242755736, ('disease', 'rev_off-label use', 'drug'): 0.7683902176834184, ('drug', 'contraindication', 'disease'): 0.8069210076458118, ('drug', 'indication', 'disease'): 0.806412757143719, ('drug', 'off-label use', 'disease'): 0.7413383499059393}
+{('disease', 'rev_contraindication', 'drug'): 0.7110931591226364, ('disease', 'rev_indication', 'drug'): 0.8032547032496511, ('disease', 'rev_off-label use', 'drug'): 0.7771993504498125, ('drug', 'contraindication', 'disease'): 0.7796103743477397, ('drug', 'indication', 'disease'): 0.7882015209140041, ('drug', 'off-label use', 'disease'): 0.7075447051784786}
+0.48982226848602295
+Testing Loss 0.5584 Testing Micro AUROC 0.7997 Testing Micro AUPRC 0.7773 Testing Macro AUROC 0.7976 Testing Macro AUPRC 0.7774
+{('disease', 'rev_contraindication', 'drug'): 0.7523667159478968, ('disease', 'rev_indication', 'drug'): 0.8462357980252971, ('disease', 'rev_off-label use', 'drug'): 0.7916957807041118, ('drug', 'contraindication', 'disease'): 0.8247932460125492, ('drug', 'indication', 'disease'): 0.831400189024513, ('drug', 'off-label use', 'disease'): 0.7388336468691212}
+{('disease', 'rev_contraindication', 'drug'): 0.7387732967555242, ('disease', 'rev_indication', 'drug'): 0.8280367142391788, ('disease', 'rev_off-label use', 'drug'): 0.7908531661553666, ('drug', 'contraindication', 'disease'): 0.7982255276190429, ('drug', 'indication', 'disease'): 0.8049511070524107, ('drug', 'off-label use', 'disease'): 0.7038450749443865}
+0.47556906938552856
+Testing Loss 0.5329 Testing Micro AUROC 0.8182 Testing Micro AUPRC 0.7942 Testing Macro AUROC 0.8243 Testing Macro AUPRC 0.8026
+{('disease', 'rev_contraindication', 'drug'): 0.7734910860147975, ('disease', 'rev_indication', 'drug'): 0.8633139616722637, ('disease', 'rev_off-label use', 'drug'): 0.839672131147541, ('drug', 'contraindication', 'disease'): 0.8382486720176524, ('drug', 'indication', 'disease'): 0.84653099800921, ('drug', 'off-label use', 'disease'): 0.7847245364149422}
+{('disease', 'rev_contraindication', 'drug'): 0.755141207001091, ('disease', 'rev_indication', 'drug'): 0.8497214288815084, ('disease', 'rev_off-label use', 'drug'): 0.8314639235088164, ('drug', 'contraindication', 'disease'): 0.8040162687760406, ('drug', 'indication', 'disease'): 0.8255740728112653, ('drug', 'off-label use', 'disease'): 0.7497130808224652}
+0.4599560499191284
+Testing Loss 0.5208 Testing Micro AUROC 0.8305 Testing Micro AUPRC 0.8058 Testing Macro AUROC 0.8429 Testing Macro AUPRC 0.8188
+{('disease', 'rev_contraindication', 'drug'): 0.7878281791234703, ('disease', 'rev_indication', 'drug'): 0.8691986567194193, ('disease', 'rev_off-label use', 'drug'): 0.8590110185434023, ('drug', 'contraindication', 'disease'): 0.8467600636524317, ('drug', 'indication', 'disease'): 0.8645558929397335, ('drug', 'off-label use', 'disease'): 0.8302176834184359}
+{('disease', 'rev_contraindication', 'drug'): 0.7641586826328383, ('disease', 'rev_indication', 'drug'): 0.8529128351421055, ('disease', 'rev_off-label use', 'drug'): 0.8487963680834102, ('drug', 'contraindication', 'disease'): 0.8158424297493871, ('drug', 'indication', 'disease'): 0.843832685979287, ('drug', 'off-label use', 'disease'): 0.7870675839084509}
+0.4589175581932068
+Testing Loss 0.5022 Testing Micro AUROC 0.8439 Testing Micro AUPRC 0.8199 Testing Macro AUROC 0.8530 Testing Macro AUPRC 0.8289
+{('disease', 'rev_contraindication', 'drug'): 0.800354769098687, ('disease', 'rev_indication', 'drug'): 0.8750519817410365, ('disease', 'rev_off-label use', 'drug'): 0.866084385917764, ('drug', 'contraindication', 'disease'): 0.8595004961402483, ('drug', 'indication', 'disease'): 0.8781672665848901, ('drug', 'off-label use', 'disease'): 0.8391185165278151}
+{('disease', 'rev_contraindication', 'drug'): 0.7832350729103785, ('disease', 'rev_indication', 'drug'): 0.860093866127398, ('disease', 'rev_off-label use', 'drug'): 0.8527359779340937, ('drug', 'contraindication', 'disease'): 0.8278184081662066, ('drug', 'indication', 'disease'): 0.849296400183774, ('drug', 'off-label use', 'disease'): 0.8001740721549038}
+0.4425923824310303
+Testing Loss 0.4860 Testing Micro AUROC 0.8530 Testing Micro AUPRC 0.8298 Testing Macro AUROC 0.8612 Testing Macro AUPRC 0.8409
+{('disease', 'rev_contraindication', 'drug'): 0.8094759283632103, ('disease', 'rev_indication', 'drug'): 0.8862422329023306, ('disease', 'rev_off-label use', 'drug'): 0.8749099704380543, ('drug', 'contraindication', 'disease'): 0.8694349049602647, ('drug', 'indication', 'disease'): 0.8803398419433328, ('drug', 'off-label use', 'disease'): 0.8469873689868315}
+{('disease', 'rev_contraindication', 'drug'): 0.7904572070286053, ('disease', 'rev_indication', 'drug'): 0.8695101665072474, ('disease', 'rev_off-label use', 'drug'): 0.867134567430332, ('drug', 'contraindication', 'disease'): 0.837823161524712, ('drug', 'indication', 'disease'): 0.8616701458096508, ('drug', 'off-label use', 'disease'): 0.818981449896797}
+0.4376397430896759
+Testing Loss 0.4844 Testing Micro AUROC 0.8559 Testing Micro AUPRC 0.8288 Testing Macro AUROC 0.8650 Testing Macro AUPRC 0.8419
+{('disease', 'rev_contraindication', 'drug'): 0.8126333077872657, ('disease', 'rev_indication', 'drug'): 0.8915389410605482, ('disease', 'rev_off-label use', 'drug'): 0.8795001343724804, ('drug', 'contraindication', 'disease'): 0.8709263020187171, ('drug', 'indication', 'disease'): 0.8826419192020752, ('drug', 'off-label use', 'disease'): 0.8528675087342112}
+{('disease', 'rev_contraindication', 'drug'): 0.7880314572129666, ('disease', 'rev_indication', 'drug'): 0.8706962714096684, ('disease', 'rev_off-label use', 'drug'): 0.8626854208140843, ('drug', 'contraindication', 'disease'): 0.8351108977956454, ('drug', 'indication', 'disease'): 0.8636212611113445, ('drug', 'off-label use', 'disease'): 0.8313976690771743}
+
+
+0.4358445703983307
+Testing Loss 0.4849 Testing Micro AUROC 0.8589 Testing Micro AUPRC 0.8320 Testing Macro AUROC 0.8663 Testing Macro AUPRC 0.8428
+{('disease', 'rev_contraindication', 'drug'): 0.8195825866489785, ('disease', 'rev_indication', 'drug'): 0.8926425224717971, ('disease', 'rev_off-label use', 'drug'): 0.8742219833378124, ('drug', 'contraindication', 'disease'): 0.8718030713903206, ('drug', 'indication', 'disease'): 0.8895183896720223, ('drug', 'off-label use', 'disease'): 0.849857565170653}
+{('disease', 'rev_contraindication', 'drug'): 0.7936375319590329, ('disease', 'rev_indication', 'drug'): 0.8729010428763238, ('disease', 'rev_off-label use', 'drug'): 0.8645246773286793, ('drug', 'contraindication', 'disease'): 0.8377342044176452, ('drug', 'indication', 'disease'): 0.8741570679256732, ('drug', 'off-label use', 'disease'): 0.8138198535488128}
+0.43004509806632996
+Testing Loss 0.4924 Testing Micro AUROC 0.8573 Testing Micro AUPRC 0.8317 Testing Macro AUROC 0.8689 Testing Macro AUPRC 0.8452
+{('disease', 'rev_contraindication', 'drug'): 0.8163063807124601, ('disease', 'rev_indication', 'drug'): 0.8990299422871967, ('disease', 'rev_off-label use', 'drug'): 0.8771136791185166, ('drug', 'contraindication', 'disease'): 0.8724082050121278, ('drug', 'indication', 'disease'): 0.8894009531661605, ('drug', 'off-label use', 'disease'): 0.8588658962644451}
+{('disease', 'rev_contraindication', 'drug'): 0.7873486686025695, ('disease', 'rev_indication', 'drug'): 0.8823536001808807, ('disease', 'rev_off-label use', 'drug'): 0.8707889947394718, ('drug', 'contraindication', 'disease'): 0.8432576334394626, ('drug', 'indication', 'disease'): 0.865742236333457, ('drug', 'off-label use', 'disease'): 0.8216861178443787}
+0.4354569613933563
+Testing Loss 0.4935 Testing Micro AUROC 0.8591 Testing Micro AUPRC 0.8304 Testing Macro AUROC 0.8746 Testing Macro AUPRC 0.8520
+{('disease', 'rev_contraindication', 'drug'): 0.8201892272652368, ('disease', 'rev_indication', 'drug'): 0.9059056083975146, ('disease', 'rev_off-label use', 'drug'): 0.8903896801934963, ('drug', 'contraindication', 'disease'): 0.8749362635534371, ('drug', 'indication', 'disease'): 0.8891813629873917, ('drug', 'off-label use', 'disease'): 0.8667347487234613}
+{('disease', 'rev_contraindication', 'drug'): 0.7874790312330019, ('disease', 'rev_indication', 'drug'): 0.8890678012729594, ('disease', 'rev_off-label use', 'drug'): 0.8763394411549321, ('drug', 'contraindication', 'disease'): 0.8411143858039927, ('drug', 'indication', 'disease'): 0.8698187294660722, ('drug', 'off-label use', 'disease'): 0.8484507369517578}
+0.42573145031929016
+Testing Loss 0.4750 Testing Micro AUROC 0.8652 Testing Micro AUPRC 0.8382 Testing Macro AUROC 0.8782 Testing Macro AUPRC 0.8531
+{('disease', 'rev_contraindication', 'drug'): 0.828183305379842, ('disease', 'rev_indication', 'drug'): 0.910259607070321, ('disease', 'rev_off-label use', 'drug'): 0.8869497446922869, ('drug', 'contraindication', 'disease'): 0.8729328651302506, ('drug', 'indication', 'disease'): 0.8960779424480685, ('drug', 'off-label use', 'disease'): 0.8750550927170115}
+{('disease', 'rev_contraindication', 'drug'): 0.8022794219269253, ('disease', 'rev_indication', 'drug'): 0.8865414572837698, ('disease', 'rev_off-label use', 'drug'): 0.8574716279945847, ('drug', 'contraindication', 'disease'): 0.8429156288052353, ('drug', 'indication', 'disease'): 0.8753196976015645, ('drug', 'off-label use', 'disease'): 0.8540321054832101}
+0.43633177876472473
+Testing Loss 0.4688 Testing Micro AUROC 0.8690 Testing Micro AUPRC 0.8423 Testing Macro AUROC 0.8816 Testing Macro AUPRC 0.8590
+{('disease', 'rev_contraindication', 'drug'): 0.8264800249015765, ('disease', 'rev_indication', 'drug'): 0.9117146936395263, ('disease', 'rev_off-label use', 'drug'): 0.8924428916957806, ('drug', 'contraindication', 'disease'): 0.8792666121084443, ('drug', 'indication', 'disease'): 0.8984435641175169, ('drug', 'off-label use', 'disease'): 0.8814189733942489}
+{('disease', 'rev_contraindication', 'drug'): 0.7971763335267618, ('disease', 'rev_indication', 'drug'): 0.8919741957189964, ('disease', 'rev_off-label use', 'drug'): 0.8708552369703568, ('drug', 'contraindication', 'disease'): 0.8480697396854427, ('drug', 'indication', 'disease'): 0.8798342310879138, ('drug', 'off-label use', 'disease'): 0.86630925332674}
+0.4174118638038635
+Testing Loss 0.4640 Testing Micro AUROC 0.8732 Testing Micro AUPRC 0.8462 Testing Macro AUROC 0.8812 Testing Macro AUPRC 0.8573
+{('disease', 'rev_contraindication', 'drug'): 0.8315585962015151, ('disease', 'rev_indication', 'drug'): 0.9119873715538218, ('disease', 'rev_off-label use', 'drug'): 0.883982800322494, ('drug', 'contraindication', 'disease'): 0.8850581424831607, ('drug', 'indication', 'disease'): 0.9054801021536728, ('drug', 'off-label use', 'disease'): 0.8692287019618383}
+{('disease', 'rev_contraindication', 'drug'): 0.8069077778902889, ('disease', 'rev_indication', 'drug'): 0.8954162331306251, ('disease', 'rev_off-label use', 'drug'): 0.8711135315877832, ('drug', 'contraindication', 'disease'): 0.8505773745059996, ('drug', 'indication', 'disease'): 0.8843187701031737, ('drug', 'off-label use', 'disease'): 0.8351944259403623}
+0.42193862795829773
+Testing Loss 0.4794 Testing Micro AUROC 0.8703 Testing Micro AUPRC 0.8417 Testing Macro AUROC 0.8767 Testing Macro AUPRC 0.8491
+{('disease', 'rev_contraindication', 'drug'): 0.8323624270416894, ('disease', 'rev_indication', 'drug'): 0.908444167387239, ('disease', 'rev_off-label use', 'drug'): 0.8823810803547434, ('drug', 'contraindication', 'disease'): 0.8822766828249125, ('drug', 'indication', 'disease'): 0.89501377465865, ('drug', 'off-label use', 'disease'): 0.859596882558452}
+{('disease', 'rev_contraindication', 'drug'): 0.8049598353384204, ('disease', 'rev_indication', 'drug'): 0.8909762674832642, ('disease', 'rev_off-label use', 'drug'): 0.8686940752464207, ('drug', 'contraindication', 'disease'): 0.8463317966629299, ('drug', 'indication', 'disease'): 0.8708188573964695, ('drug', 'off-label use', 'disease'): 0.8129963016249233}
+0.4222010374069214
+Testing Loss 0.4695 Testing Micro AUROC 0.8754 Testing Micro AUPRC 0.8474 Testing Macro AUROC 0.8845 Testing Macro AUPRC 0.8613
+{('disease', 'rev_contraindication', 'drug'): 0.8368563221694935, ('disease', 'rev_indication', 'drug'): 0.9118096080757705, ('disease', 'rev_off-label use', 'drug'): 0.8985165278151035, ('drug', 'contraindication', 'disease'): 0.8861374519089815, ('drug', 'indication', 'disease'): 0.8993347945866597, ('drug', 'off-label use', 'disease'): 0.874302606826122}
+{('disease', 'rev_contraindication', 'drug'): 0.8035626305157431, ('disease', 'rev_indication', 'drug'): 0.8971447019879703, ('disease', 'rev_off-label use', 'drug'): 0.8943219321232345, ('drug', 'contraindication', 'disease'): 0.851870747522617, ('drug', 'indication', 'disease'): 0.8832301701393618, ('drug', 'off-label use', 'disease'): 0.8374903317895379}
+0.4120163917541504
+Testing Loss 0.4653 Testing Micro AUROC 0.8768 Testing Micro AUPRC 0.8489 Testing Macro AUROC 0.8837 Testing Macro AUPRC 0.8570
+{('disease', 'rev_contraindication', 'drug'): 0.839908438031145, ('disease', 'rev_indication', 'drug'): 0.912813448893, ('disease', 'rev_off-label use', 'drug'): 0.8864660037624295, ('drug', 'contraindication', 'disease'): 0.8860531355694471, ('drug', 'indication', 'disease'): 0.9051060749260994, ('drug', 'off-label use', 'disease'): 0.8720666487503359}
+{('disease', 'rev_contraindication', 'drug'): 0.8115730902904754, ('disease', 'rev_indication', 'drug'): 0.8955439840538002, ('disease', 'rev_off-label use', 'drug'): 0.849613845172482, ('drug', 'contraindication', 'disease'): 0.8503411364081763, ('drug', 'indication', 'disease'): 0.8844928574915257, ('drug', 'off-label use', 'disease'): 0.8506314415638287}
+0.4422104060649872
+Testing Loss 0.4616 Testing Micro AUROC 0.8785 Testing Micro AUPRC 0.8513 Testing Macro AUROC 0.8840 Testing Macro AUPRC 0.8573
+{('disease', 'rev_contraindication', 'drug'): 0.8454546673840965, ('disease', 'rev_indication', 'drug'): 0.9112087514327656, ('disease', 'rev_off-label use', 'drug'): 0.8866272507390487, ('drug', 'contraindication', 'disease'): 0.8872809592984157, ('drug', 'indication', 'disease'): 0.9005871825293088, ('drug', 'off-label use', 'disease'): 0.8727116366568126}
+{('disease', 'rev_contraindication', 'drug'): 0.821412058717975, ('disease', 'rev_indication', 'drug'): 0.8984680784092343, ('disease', 'rev_off-label use', 'drug'): 0.8653820858116634, ('drug', 'contraindication', 'disease'): 0.8499807831299248, ('drug', 'indication', 'disease'): 0.8732212962416441, ('drug', 'off-label use', 'disease'): 0.8353611297147517}
+0.4413716793060303
+Testing Loss 0.4542 Testing Micro AUROC 0.8811 Testing Micro AUPRC 0.8546 Testing Macro AUROC 0.8916 Testing Macro AUPRC 0.8688
+{('disease', 'rev_contraindication', 'drug'): 0.8473717903749621, ('disease', 'rev_indication', 'drug'): 0.9102033018962778, ('disease', 'rev_off-label use', 'drug'): 0.9067401236226821, ('drug', 'contraindication', 'disease'): 0.8902078439211873, ('drug', 'indication', 'disease'): 0.9070856039735364, ('drug', 'off-label use', 'disease'): 0.8880515990325182}
+{('disease', 'rev_contraindication', 'drug'): 0.8240414689589051, ('disease', 'rev_indication', 'drug'): 0.8938420550006128, ('disease', 'rev_off-label use', 'drug'): 0.8863092578100978, ('drug', 'contraindication', 'disease'): 0.8548895165360468, ('drug', 'indication', 'disease'): 0.8791557745590257, ('drug', 'off-label use', 'disease'): 0.8743001451765615}
+0.42146623134613037
+Testing Loss 0.4606 Testing Micro AUROC 0.8801 Testing Micro AUPRC 0.8541 Testing Macro AUROC 0.8898 Testing Macro AUPRC 0.8696
+{('disease', 'rev_contraindication', 'drug'): 0.8411700937855392, ('disease', 'rev_indication', 'drug'): 0.9114902773029823, ('disease', 'rev_off-label use', 'drug'): 0.901311475409836, ('drug', 'contraindication', 'disease'): 0.8928354394459866, ('drug', 'indication', 'disease'): 0.9096362283576986, ('drug', 'off-label use', 'disease'): 0.8824294544477291}
+{('disease', 'rev_contraindication', 'drug'): 0.8122516306545884, ('disease', 'rev_indication', 'drug'): 0.9002066059246594, ('disease', 'rev_off-label use', 'drug'): 0.8916075589695895, ('drug', 'contraindication', 'disease'): 0.8601607922447992, ('drug', 'indication', 'disease'): 0.8914298800323872, ('drug', 'off-label use', 'disease'): 0.8621948192294595}
+0.42471808195114136
+Testing Loss 0.4617 Testing Micro AUROC 0.8818 Testing Micro AUPRC 0.8548 Testing Macro AUROC 0.8921 Testing Macro AUPRC 0.8685
+{('disease', 'rev_contraindication', 'drug'): 0.8453833111968406, ('disease', 'rev_indication', 'drug'): 0.9157051217599388, ('disease', 'rev_off-label use', 'drug'): 0.9049556570814298, ('drug', 'contraindication', 'disease'): 0.8891598046302254, ('drug', 'indication', 'disease'): 0.9120686118763699, ('drug', 'off-label use', 'disease'): 0.8850846546627251}
+{('disease', 'rev_contraindication', 'drug'): 0.8143200740577472, ('disease', 'rev_indication', 'drug'): 0.9040794322030303, ('disease', 'rev_off-label use', 'drug'): 0.8757960292217071, ('drug', 'contraindication', 'disease'): 0.8570038894190033, ('drug', 'indication', 'disease'): 0.8924774379839158, ('drug', 'off-label use', 'disease'): 0.8673907117538872}
+0.4099501967430115
+Testing Loss 0.4600 Testing Micro AUROC 0.8852 Testing Micro AUPRC 0.8615 Testing Macro AUROC 0.8945 Testing Macro AUPRC 0.8735
+{('disease', 'rev_contraindication', 'drug'): 0.8498301127480503, ('disease', 'rev_indication', 'drug'): 0.9188252327615677, ('disease', 'rev_off-label use', 'drug'): 0.9051169040580488, ('drug', 'contraindication', 'disease'): 0.8942714544583641, ('drug', 'indication', 'disease'): 0.9100794305133826, ('drug', 'off-label use', 'disease'): 0.8887825853265251}
+{('disease', 'rev_contraindication', 'drug'): 0.8281670440259551, ('disease', 'rev_indication', 'drug'): 0.9046673965584976, ('disease', 'rev_off-label use', 'drug'): 0.8855915294939246, ('drug', 'contraindication', 'disease'): 0.8622724786596744, ('drug', 'indication', 'disease'): 0.8916012474135506, ('drug', 'off-label use', 'disease'): 0.8684034254276654}
+0.4140206277370453
+Testing Loss 0.4611 Testing Micro AUROC 0.8853 Testing Micro AUPRC 0.8602 Testing Macro AUROC 0.8966 Testing Macro AUPRC 0.8755
+{('disease', 'rev_contraindication', 'drug'): 0.8506935452187624, ('disease', 'rev_indication', 'drug'): 0.9215270767560176, ('disease', 'rev_off-label use', 'drug'): 0.9143079817253428, ('drug', 'contraindication', 'disease'): 0.8921708548930865, ('drug', 'indication', 'disease'): 0.912234309959983, ('drug', 'off-label use', 'disease'): 0.8886213383499059}
+{('disease', 'rev_contraindication', 'drug'): 0.8234023625495934, ('disease', 'rev_indication', 'drug'): 0.9069010003084889, ('disease', 'rev_off-label use', 'drug'): 0.8917771225885198, ('drug', 'contraindication', 'disease'): 0.859349096005456, ('drug', 'indication', 'disease'): 0.9018029339908493, ('drug', 'off-label use', 'disease'): 0.8695403321951252}
+0.41139671206474304
+Testing Loss 0.4544 Testing Micro AUROC 0.8855 Testing Micro AUPRC 0.8577 Testing Macro AUROC 0.8953 Testing Macro AUPRC 0.8723
+{('disease', 'rev_contraindication', 'drug'): 0.849512664366943, ('disease', 'rev_indication', 'drug'): 0.9250276498622535, ('disease', 'rev_off-label use', 'drug'): 0.8991615157215802, ('drug', 'contraindication', 'disease'): 0.8906905342438494, ('drug', 'indication', 'disease'): 0.9148870880170523, ('drug', 'off-label use', 'disease'): 0.8922332706261757}
+{('disease', 'rev_contraindication', 'drug'): 0.8223943671663864, ('disease', 'rev_indication', 'drug'): 0.9160641393184705, ('disease', 'rev_off-label use', 'drug'): 0.8712709196158247, ('drug', 'contraindication', 'disease'): 0.8479230012723025, ('drug', 'indication', 'disease'): 0.9011948258079172, ('drug', 'off-label use', 'disease'): 0.8751879399863713}
+0.40415000915527344
+Testing Loss 0.4580 Testing Micro AUROC 0.8851 Testing Micro AUPRC 0.8577 Testing Macro AUROC 0.8975 Testing Macro AUPRC 0.8758
+{('disease', 'rev_contraindication', 'drug'): 0.8499736916443712, ('disease', 'rev_indication', 'drug'): 0.9260387299161456, ('disease', 'rev_off-label use', 'drug'): 0.9112227895726954, ('drug', 'contraindication', 'disease'): 0.8910596725346268, ('drug', 'indication', 'disease'): 0.91176054213839, ('drug', 'off-label use', 'disease'): 0.8950819672131147}
+{('disease', 'rev_contraindication', 'drug'): 0.8211023725187346, ('disease', 'rev_indication', 'drug'): 0.9178822304208999, ('disease', 'rev_off-label use', 'drug'): 0.8897488428803881, ('drug', 'contraindication', 'disease'): 0.8532673820535199, ('drug', 'indication', 'disease'): 0.8993955207284774, ('drug', 'off-label use', 'disease'): 0.8733872849314527}
+0.42215460538864136
+Testing Loss 0.4651 Testing Micro AUROC 0.8856 Testing Micro AUPRC 0.8585 Testing Macro AUROC 0.8943 Testing Macro AUPRC 0.8705
+{('disease', 'rev_contraindication', 'drug'): 0.8510134424658529, ('disease', 'rev_indication', 'drug'): 0.9174135816123388, ('disease', 'rev_off-label use', 'drug'): 0.9104273044880408, ('drug', 'contraindication', 'disease'): 0.8960720867781656, ('drug', 'indication', 'disease'): 0.9093547024874822, ('drug', 'off-label use', 'disease'): 0.8814512227895728}
+{('disease', 'rev_contraindication', 'drug'): 0.8211562110840867, ('disease', 'rev_indication', 'drug'): 0.9019720598720562, ('disease', 'rev_off-label use', 'drug'): 0.881671328141914, ('drug', 'contraindication', 'disease'): 0.8612544967920843, ('drug', 'indication', 'disease'): 0.8991939881351396, ('drug', 'off-label use', 'disease'): 0.8576400338673956}
+0.4232269525527954
+Testing Loss 0.4498 Testing Micro AUROC 0.8881 Testing Micro AUPRC 0.8618 Testing Macro AUROC 0.8952 Testing Macro AUPRC 0.8713
+{('disease', 'rev_contraindication', 'drug'): 0.8551100561815066, ('disease', 'rev_indication', 'drug'): 0.9219059301413662, ('disease', 'rev_off-label use', 'drug'): 0.9099650631550659, ('drug', 'contraindication', 'disease'): 0.8935453845318625, ('drug', 'indication', 'disease'): 0.9153672907156789, ('drug', 'off-label use', 'disease'): 0.8753668368718086}
+{('disease', 'rev_contraindication', 'drug'): 0.8304901938036799, ('disease', 'rev_indication', 'drug'): 0.9112810595693399, ('disease', 'rev_off-label use', 'drug'): 0.8896818454151396, ('drug', 'contraindication', 'disease'): 0.8556830370142308, ('drug', 'indication', 'disease'): 0.89439621167229, ('drug', 'off-label use', 'disease'): 0.8460064471087151}
+0.41746723651885986
+Testing Loss 0.4495 Testing Micro AUROC 0.8880 Testing Micro AUPRC 0.8617 Testing Macro AUROC 0.8963 Testing Macro AUPRC 0.8739
+{('disease', 'rev_contraindication', 'drug'): 0.8515237107869682, ('disease', 'rev_indication', 'drug'): 0.9193062398198234, ('disease', 'rev_off-label use', 'drug'): 0.9115990325181403, ('drug', 'contraindication', 'disease'): 0.8981729123926105, ('drug', 'indication', 'disease'): 0.9172398399324339, ('drug', 'off-label use', 'disease'): 0.8800107497984412}
+{('disease', 'rev_contraindication', 'drug'): 0.8264279600795846, ('disease', 'rev_indication', 'drug'): 0.9061779181507218, ('disease', 'rev_off-label use', 'drug'): 0.9004850750673933, ('drug', 'contraindication', 'disease'): 0.8646693700467607, ('drug', 'indication', 'disease'): 0.8944352748215507, ('drug', 'off-label use', 'disease'): 0.8510988898216405}
+

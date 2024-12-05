@@ -121,9 +121,8 @@ class TxGNN:
                    device = self.device
                   ).to(self.device)    
         self.best_model = self.model
-
-
-    def pretrain(self, n_epoch = 1, learning_rate = 1e-3, batch_size = 1024, train_print_per_n = 20, sweep_wandb = None):
+        
+    def pretrain(self, n_epoch = 1, learning_rate = 1e-3, batch_size = 1024, train_print_per_n = 20, save_model_path = './',sweep_wandb = None):
         
         if self.no_kg:
             raise ValueError('During No-KG ablation, pretraining is infeasible because it is the same as finetuning...')
@@ -131,7 +130,7 @@ class TxGNN:
         self.G = self.G.to('cpu')
         print('Creating minibatch pretraining dataloader...')
         train_eid_dict = {etype: self.G.edges(form = 'eid', etype =  etype) for etype in self.G.canonical_etypes}
-
+        sampler = dgl.dataloading.MultiLayerFullNeighborSampler(2)
         rel_unique = self.df.relation.unique()
         reverse_etypes = {}
         for rel in rel_unique:
@@ -141,12 +140,8 @@ class TxGNN:
                 reverse_etypes[rel] = 'rev_' + rel
             else:
                 reverse_etypes[rel] = rel
+        
 
-        sampler = dgl.dataloading.MultiLayerFullNeighborSampler(2)
-
-        # sampler = dgl.dataloading.as_edge_prediction_sampler(
-        #     sampler,
-        #     negative_sampler=Minibatch_NegSampler(self.G, 1, 'fix_dst'))
         dataloader = dgl.dataloading.DistEdgeDataLoader(
             self.G,train_eid_dict,sampler,
             negative_sampler=Minibatch_NegSampler(self.G, 1, 'fix_dst'),
@@ -158,7 +153,7 @@ class TxGNN:
         optimizer = torch.optim.AdamW(self.model.parameters(), lr = learning_rate)
 
         print('Start pre-training with #param: %d' % (get_n_params(self.model)))
-        self.G = self.G.to(self.device)
+
         for epoch in range(n_epoch):
 
             for step, (nodes, pos_g, neg_g, blocks) in enumerate(dataloader):
@@ -178,24 +173,35 @@ class TxGNN:
 
                 if self.weight_bias_track:
                     self.wandb.log({"Pretraining Loss": loss})
-                if (step) % train_print_per_n == 0:
-                    print(epoch)
-                    print(loss.item())
-                    # validation tracking...
-                    # print('Validation.....')
-                    # (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc), loss = evaluate_fb(
-                    #     self.model, self.g_test_pos, self.g_test_neg, self.G, self.dd_etypes, self.device,
-                    #     mode='valid')
-                    # print(
-                    #     'Epoch: %d LR: %.5f Validation Loss %.4f,  Validation Micro AUROC %.4f Validation Micro AUPRC %.4f Validation Macro AUROC %.4f Validation Macro AUPRC %.4f ' % (
-                    #         epoch,
-                    #         optimizer.param_groups[0]['lr'],
-                    #         loss,
-                    #         micro_auroc,
-                    #         micro_auprc,
-                    #         macro_auroc,
-                    #         macro_auprc
-                    #     ))
+
+                if step % train_print_per_n == 0:
+                    # pretraining tracking...
+                    auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc = get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, self.G, True)
+                    
+                    if self.weight_bias_track:
+                        temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Pretraining")
+                        temp_d.update({"Pretraining LR": optimizer.param_groups[0]['lr']})
+                        self.wandb.log(temp_d)
+                    
+                    
+                    if sweep_wandb is not None:
+                        sweep_wandb.log({'pretraining_loss': loss, 
+                                  'pretraining_micro_auroc': micro_auroc,
+                                  'pretraining_macro_auroc': macro_auroc,
+                                  'pretraining_micro_auprc': micro_auprc, 
+                                  'pretraining_macro_auprc': macro_auprc})
+                    
+                    print('Epoch: %d Step: %d LR: %.5f Loss %.4f, Pretrain Micro AUROC %.4f Pretrain Micro AUPRC %.4f Pretrain Macro AUROC %.4f Pretrain Macro AUPRC %.4f' % (
+                        epoch,
+                        step,
+                        optimizer.param_groups[0]['lr'], 
+                        loss.item(),
+                        micro_auroc,
+                        micro_auprc,
+                        macro_auroc,
+                        macro_auprc
+                    ))
+                    self.G = self.G.to(self.device)
                     (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
                      macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
                                                                           self.g_test_neg, self.G, self.dd_etypes,
@@ -209,49 +215,31 @@ class TxGNN:
                             macro_auroc,
                             macro_auprc
                         ))
-                    print(auroc_rel)
-                    print(auprc_rel)
-                # if step % train_print_per_n == 0:
-                #     # pretraining tracking...
-                #     auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc = get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, self.G, True)
-                #
-                #     if self.weight_bias_track:
-                #         temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Pretraining")
-                #         temp_d.update({"Pretraining LR": optimizer.param_groups[0]['lr']})
-                #         self.wandb.log(temp_d)
-                #
-                #
-                #     if sweep_wandb is not None:
-                #         sweep_wandb.log({'pretraining_loss': loss,
-                #                   'pretraining_micro_auroc': micro_auroc,
-                #                   'pretraining_macro_auroc': macro_auroc,
-                #                   'pretraining_micro_auprc': micro_auprc,
-                #                   'pretraining_macro_auprc': macro_auprc})
-                #
-                #     print('Epoch: %d Step: %d LR: %.5f Loss %.4f, Pretrain Micro AUROC %.4f Pretrain Micro AUPRC %.4f Pretrain Macro AUROC %.4f Pretrain Macro AUPRC %.4f' % (
-                #         epoch,
-                #         step,
-                #         optimizer.param_groups[0]['lr'],
-                #         loss.item(),
-                #         micro_auroc,
-                #         micro_auprc,
-                #         macro_auroc,
-                #         macro_auprc
-                #     ))
-        # self.best_model = copy.deepcopy(self.model)
+
+                    print('----- AUROC Performance in Each Relation -----')
+                    print_dict(auroc_rel)
+                    print('----- AUPRC Performance in Each Relation -----')
+                    print_dict(auprc_rel)
+                    print('----------------------------------------------')
+
+        checkpoint_path = os.path.join(save_model_path, f'model.pth')
+        torch.save(self.model.state_dict(), checkpoint_path)
+        self.best_model = copy.deepcopy(self.model)
         
     def finetune(self, n_epoch = 500, 
                        learning_rate = 1e-3, 
                        train_print_per_n = 5, 
                        valid_per_n = 25,
+                       model_path = './',
                        sweep_wandb = None,
                        save_name = None):
         
         best_val_acc = 0
-
+        self.model.load_state_dict(torch.load(model_path))
+        self.model = self.model.to(self.device)
         self.G = self.G.to(self.device)
         neg_sampler = Full_Graph_NegSampler(self.G, 1, 'fix_dst', self.device)
-        torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
+        # torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
         
         optimizer = torch.optim.AdamW(self.model.parameters(), lr = learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', 0.8)
