@@ -10,7 +10,7 @@ import torch
 import argparse
 import os
 from txgnn.utils import get_time_str
-
+import re
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='TxGNN_prompt')
@@ -33,21 +33,20 @@ if __name__ == '__main__':
         choices=['random', 'complex_disease', 'disease_eval', 'cell_proliferation', 'mental_health', 'cardiovascular', 'anemia', 'adrenal_gland','autoimmune', 'metabolic_disorder', 'diabetes', 'neurodigenerative', 'full_graph', 'downstream_pred', 'few_edeges_to_kg', 'few_edeges_to_indications'],  # 指定合法的候选项
         help="Choose the data split type"
     )
+    model_path = '/data/zhaojingtong/PrimeKG/our/random/lr0.001_batch1024_epochs30_hidden512_splitrandom_time12_22_16_56_seed12/model4_0.pth'
+    save_result_path = os.path.dirname(model_path)
+    seed = int(save_result_path[-2:])
 
+    match = re.search(r'split([a-zA-Z]+)_', save_result_path)
+    split = match.group(1)
 
     args = parser.parse_args()
     gpu_id = args.gpu # 选择你想使用的 GPU ID，例如 0, 1, 2 等
     hidden_dim = args.num_hidden
-    seed = args.seed
     epochs = args.epochs
     batch_size = args.batch_size
     lr = args.lr
     time_str = get_time_str()
-    split = args.split
-    model_save_path = '/data/zhaojingtong/PrimeKG/model'
-    model_save_path = os.path.join(model_save_path,
-                             f"lr{lr}_batch{batch_size}_epochs{epochs}_hidden{hidden_dim}_split{split}_time{time_str}_seed{seed}")
-    pretrain_model_path = '/data/zhaojingtong/PrimeKG/model/model5_5000.pth'
 
 
     device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
@@ -72,10 +71,8 @@ if __name__ == '__main__':
                           walk_mode = 'bit',
                           path_length = 2)
 
-
-
-    TxGNN.finetune(n_epoch = 5001,
-                   learning_rate = 1e-3,
-                   train_print_per_n = 500,
-                   valid_per_n = 500,
-                   model_save_path = pretrain_model_path)
+    TxGNN.finetune(n_epoch = 1000,
+                   learning_rate = 5e-4,
+                   train_print_per_n = 100,
+                   valid_per_n = 100,
+                   model_save_path = model_path,save_result_path =save_result_path)

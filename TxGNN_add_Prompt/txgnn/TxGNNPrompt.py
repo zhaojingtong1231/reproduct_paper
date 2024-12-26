@@ -33,46 +33,57 @@ class TxGNNPrompt:
         
         self.disease_rel_types = ['rev_contraindication', 'rev_indication', 'rev_off-label use']
         
-        self.dd_etypes = [('drug', 'contraindication', 'disease'), 
-                  ('drug', 'indication', 'disease'), 
+        self.dd_etypes= [('drug', 'contraindication', 'disease'),
+                  ('drug', 'indication', 'disease'),
                   ('drug', 'off-label use', 'disease'),
-                  ('disease', 'rev_contraindication', 'drug'), 
-                  ('disease', 'rev_indication', 'drug'), 
+                  ('disease', 'rev_contraindication', 'drug'),
+                  ('disease', 'rev_indication', 'drug'),
                   ('disease', 'rev_off-label use', 'drug')]
-        
+        # self.dd_etypes = [('drug', 'contraindication', 'disease'),
+        #                   ('drug', 'indication', 'disease'),
+        #                   ('drug', 'off-label use', 'disease'),
+        #                   ('disease', 'rev_contraindication', 'drug'),
+        #                   ('disease', 'rev_indication', 'drug'),
+        #                   ('disease', 'rev_off-label use', 'drug'),
+        #                   ('drug', 'drug_drug', 'drug'),
+        #                   ('gene/protein', 'protein_protein', 'gene/protein'),
+        #                   ('disease', 'disease_disease', 'disease'),
+        #                   ('drug', 'drug_protein', 'gene/protein'),
+        #           ('gene/protein', 'disease_protein', 'disease')]
+
         if self.weight_bias_track:
             import wandb
-            wandb.init(project=proj_name, name=exp_name)  
+            wandb.init(project=proj_name, name=exp_name)
             self.wandb = wandb
         else:
             self.wandb = None
         self.config = None
-        
-    def model_initialize(self, n_hid = 128, 
-                               n_inp = 128, 
-                               n_out = 128, 
+
+    def model_initialize(self, n_hid = 128,
+                               n_inp = 128,
+                               n_out = 128,
                                proto = True,
                                proto_num = 5,
                                sim_measure = 'all_nodes_profile',
                                bert_measure = 'disease_name',
-                               agg_measure = 'rarity', 
+                               agg_measure = 'rarity',
                                exp_lambda = 0.7,
                                num_walks = 200,
                                walk_mode = 'bit',
                                path_length = 2):
-        
+
         if self.no_kg and proto:
             print('Ablation study on No-KG. No proto learning is used...')
             proto = False
-        
+
         self.G = self.G.to('cpu')
         self.G = initialize_node_embedding(self.G, n_inp)
         self.g_valid_pos, self.g_valid_neg = evaluate_graph_construct(self.df_valid, self.G, 'fix_dst', 1, self.device)
         self.g_test_pos, self.g_test_neg = evaluate_graph_construct(self.df_test, self.G, 'fix_dst', 1, self.device)
 
-        self.config = {'n_hid': n_hid, 
-                       'n_inp': n_inp, 
-                       'n_out': n_out, 
+        self.config = {'n_hid': n_hid,
+                       'n_inp': n_inp,
+                       'n_out': n_out,
                        'proto': proto,
                        'proto_num': proto_num,
                        'sim_measure': sim_measure,
@@ -90,7 +101,7 @@ class TxGNNPrompt:
                    proto = proto,
                    proto_num = proto_num,
                    sim_measure = sim_measure,
-                   bert_measure = bert_measure, 
+                   bert_measure = bert_measure,
                    agg_measure = agg_measure,
                    num_walks = num_walks,
                    walk_mode = walk_mode,
@@ -170,11 +181,11 @@ class TxGNNPrompt:
                     tauroc_rel, tauprc_rel, tmicro_auroc, tmicro_auprc, tmacro_auroc, tmacro_auprc = get_all_metrics_fb(
                         pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels, self.G,
                         True)
-
-                    (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
-                     macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
-                                                                          self.g_test_neg, self.G, self.dd_etypes,
-                                                                          self.device, True, mode='test')
+                    with torch.no_grad():
+                        (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
+                         macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
+                                                                              self.g_test_neg, self.G, self.dd_etypes,
+                                                                              self.device, True, mode='test')
                     # Open a text file in write mode
                     with open(save_model_path + "/output.txt", "a") as f:
                         # Redirect stdout to the file
@@ -199,8 +210,11 @@ class TxGNNPrompt:
                                 macro_auroc,
                                 macro_auprc
                             ))
+                        print('----- AUROC Performance in Each Relation -----')
                         print(auroc_rel)
+                        print('----- AUPRC Performance in Each Relation -----')
                         print(auprc_rel)
+
 
                     # Reset stdout back to the console after the block
                     sys.stdout = sys.__stdout__
@@ -216,22 +230,22 @@ class TxGNNPrompt:
 
 
     def finetune(self, n_epoch = 500,
-                       learning_rate = 1e-3, 
-                       train_print_per_n = 5, 
+                       learning_rate = 1e-3,
+                       train_print_per_n = 5,
                        valid_per_n = 25,
                        sweep_wandb = None,
                        save_name = None,
-                 model_save_path = './'):
-        
-        best_val_acc = 0
+                 model_save_path = './',
+                 save_result_path ='./'):
+
         self.model.load_state_dict(torch.load(model_save_path))
         self.model = self.model.to(self.device)
         self.G = self.G.to(self.device)
         neg_sampler = Full_Graph_NegSampler(self.G, 1, 'fix_dst', self.device)
-        # torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
-        feature_prompt = featureprompt(self.G, self.model.dgi.prompt, self.model.prompt).cuda()
+        torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
 
-        optimizer = torch.optim.AdamW([*self.model.pred.parameters(),*feature_prompt.parameters()], lr = learning_rate)
+        params = [param for key, param in self.model.prompt.items() if isinstance(param, nn.Parameter)]
+        optimizer = torch.optim.AdamW(params + list(self.model.pred.parameters()), lr = learning_rate)
 
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', 0.8)
 
@@ -240,7 +254,9 @@ class TxGNNPrompt:
 
             negative_graph = neg_sampler(self.G)
 
-            pred_score_pos, pred_score_neg, pos_score, neg_score = self.model.forward_prompt(feature_prompt,self.G, negative_graph, pretrain_mode = False, mode = 'train')
+            # pred_score_pos, pred_score_neg, pos_score, neg_score = self.model.forward_prompt(feature_prompt,self.G, negative_graph, pretrain_mode = False, mode = 'train')
+
+            pred_score_pos, pred_score_neg, pos_score, neg_score = self.model(self.G, negative_graph, pretrain_mode=False,mode='train')
 
             pos_score = torch.cat([pred_score_pos[i] for i in self.dd_etypes])
             neg_score = torch.cat([pred_score_neg[i] for i in self.dd_etypes])
@@ -285,81 +301,76 @@ class TxGNNPrompt:
             del pred_score_pos, pred_score_neg, scores, labels
 
             if (epoch) % valid_per_n == 0:
-                # validation tracking...
-                # print('Validation.....')
-                # (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc), loss = evaluate_fb_prompt(feature_prompt,self.model, self.g_valid_pos, self.g_valid_neg, self.G, self.dd_etypes, self.device, mode = 'valid')
-                #
-                # # if best_val_acc < macro_auroc:
-                # #     best_val_acc = macro_auroc
-                # #     self.best_model = self.model.load_state_dict(torch.load('model.pth'))
-                #
-                # print('Epoch: %d LR: %.5f Validation Loss %.4f,  Validation Micro AUROC %.4f Validation Micro AUPRC %.4f Validation Macro AUROC %.4f Validation Macro AUPRC %.4f (Best Macro AUROC %.4f)' % (
-                #     epoch,
-                #     optimizer.param_groups[0]['lr'],
-                #     loss,
-                #     micro_auroc,
-                #     micro_auprc,
-                #     macro_auroc,
-                #     macro_auprc,
-                #     best_val_acc
-                # ))
-                #
-                # print('----- AUROC Performance in Each Relation -----')
-                # print_dict(auroc_rel)
-                # print('----- AUPRC Performance in Each Relation -----')
-                # print_dict(auprc_rel)
-                # print('----------------------------------------------')
-                #
-                # if sweep_wandb is not None:
-                #     sweep_wandb.log({'validation_loss': loss,
-                #                   'validation_micro_auroc': micro_auroc,
-                #                   'validation_macro_auroc': macro_auroc,
-                #                   'validation_micro_auprc': micro_auprc,
-                #                   'validation_macro_auprc': macro_auprc})
-                #
-                #
-                # if self.weight_bias_track:
-                #     temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Validation")
-                #     temp_d.update({"Validation Loss": loss,
-                #                   "Validation Relation Performance": self.wandb.Table(data=to_wandb_table(auroc_rel, auprc_rel),
-                #                         columns = ["rel_id", "Rel", "AUROC", "AUPRC"])
-                #                   })
-                #
-                #     self.wandb.log(temp_d)
-        
-                print('Testing...')
-                self.best_model = self.model
-                (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc), loss, pred_pos, pred_neg = evaluate_fb_prompt(feature_prompt,self.best_model, self.g_test_pos, self.g_test_neg, self.G, self.dd_etypes, self.device, True, mode = 'test')
 
-                print('Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
-                    loss,
-                    micro_auroc,
-                    micro_auprc,
-                    macro_auroc,
-                    macro_auprc
-                ))
+                with open(save_result_path + "/result.txt", "a") as f:
+                    # Redirect stdout to the file
+                    sys.stdout = f
+                    print('Testing...')
+                    self.best_model = self.model
+                    # (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
+                    #  macro_auprc), loss, pred_pos, pred_neg = evaluate_fb_prompt(feature_prompt, self.best_model,
+                    #                                                              self.g_test_pos, self.g_test_neg,
+                    #                                                              self.G, self.dd_etypes, self.device,
+                    #                                                              True, mode='test')
+                    with torch.no_grad():
+                        (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
+                         macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
+                                                                              self.g_test_neg, self.G, self.dd_etypes,
+                                                                              self.device, True, mode='test')
+                    print(
+                        'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
+                            loss,
+                            micro_auroc,
+                            micro_auprc,
+                            macro_auroc,
+                            macro_auprc
+                        ))
 
-                if self.weight_bias_track:
-                    temp_d = get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Testing")
+                    print('----- AUROC Performance in Each Relation -----')
+                    print_dict(auroc_rel, dd_only=True)
+                    print('----- AUPRC Performance in Each Relation -----')
+                    print_dict(auprc_rel, dd_only=True)
+                    print('----------------------------------------------')
 
-                    temp_d.update({"Testing Loss": loss,
-                                  "Testing Relation Performance": self.wandb.Table(data=to_wandb_table(auroc_rel, auprc_rel),
-                                        columns = ["rel_id", "Rel", "AUROC", "AUPRC"])
-                                  })
+                sys.stdout = sys.__stdout__
 
-                    self.wandb.log(temp_d)
+    def predict_all_class(self,model_save_path='./'):
 
-                if save_name is not None:
-                    import pickle
-                    with open(save_name, 'wb') as f:
-                        pickle.dump(get_wandb_log_dict(auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc, macro_auprc, "Testing"), f)
 
-                print('----- AUROC Performance in Each Relation -----')
-                print_dict(auroc_rel, dd_only = False)
-                print('----- AUPRC Performance in Each Relation -----')
-                print_dict(auprc_rel, dd_only = False)
-                print('----------------------------------------------')
-        
+        self.model.load_state_dict(torch.load(model_save_path))
+        self.model = self.model.to(self.device)
+        self.G = self.G.to(self.device)
+        neg_sampler = Full_Graph_NegSampler(self.G, 1, 'fix_dst', self.device)
+        # torch.nn.init.xavier_uniform(self.model.w_rels)  # reinitialize decoder
+        feature_prompt = featureprompt(self.G, self.model.dgi.prompt, self.model.prompt).cuda()
+
+
+        negative_graph = neg_sampler(self.G)
+
+        print('Testing...')
+        self.best_model = self.model
+        (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
+         macro_auprc), loss, pred_pos, pred_neg = evaluate_fb_prompt(feature_prompt, self.best_model,
+                                                                     self.g_test_pos, self.g_test_neg, self.G,
+                                                                     self.dd_etypes, self.device, True,
+                                                                     mode='test')
+
+        print(
+            'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
+                loss,
+                micro_auroc,
+                micro_auprc,
+                macro_auroc,
+                macro_auprc
+            ))
+
+        print('----- AUROC Performance in Each Relation -----')
+        print_dict(auroc_rel, dd_only=True)
+        print('----- AUPRC Performance in Each Relation -----')
+        print_dict(auprc_rel, dd_only=True)
+        print('----------------------------------------------')
+
+
         
     def save_model(self, path):
         if not os.path.exists(path):

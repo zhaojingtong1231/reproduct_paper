@@ -20,10 +20,10 @@ class weighted_prompt(nn.Module):
         self.weight[0][1].data.fill_(1)
 
     def forward(self, graph_embedding):
-        graph_embedding1 = {}
+
         for key in graph_embedding:
-            graph_embedding1[key] = torch.mm(self.weight, graph_embedding[key])
-        return graph_embedding1
+            graph_embedding[key] = torch.mm(self.weight, graph_embedding[key])
+        return graph_embedding
 
 class featureprompt(nn.Module):
     def __init__(self, G, prompt1, prompt2):

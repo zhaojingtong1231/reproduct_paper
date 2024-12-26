@@ -44,10 +44,9 @@ if __name__ == '__main__':
     lr = args.lr
     time_str = get_time_str()
     split = args.split
-    model_save_path = '/data/zhaojingtong/PrimeKG/model'
+    model_save_path = '/data/zhaojingtong/PrimeKG/test'
     model_save_path = os.path.join(model_save_path,
                              f"lr{lr}_batch{batch_size}_epochs{epochs}_hidden{hidden_dim}_split{split}_time{time_str}_seed{seed}")
-    pretrain_model_path = '/data/zhaojingtong/PrimeKG/model/model14_3000.pth'
 
     os.makedirs(model_save_path, exist_ok=True)
 
@@ -65,7 +64,7 @@ if __name__ == '__main__':
                           n_inp = hidden_dim,
                           n_out = hidden_dim,
                           proto = True,
-                          proto_num = 5,
+                          proto_num = 3,
                           sim_measure = 'all_nodes_profile',
                           bert_measure = 'disease_name',
                           agg_measure = 'rarity',
@@ -78,9 +77,3 @@ if __name__ == '__main__':
                    batch_size = batch_size,
                    train_print_per_n = 1000,
                    save_model_path = model_save_path)
-    #
-    # TxGNN.finetune(n_epoch = 2000,
-    #                learning_rate = 5e-4,
-    #                train_print_per_n = 100,
-    #                valid_per_n = 100,
-    #                model_save_path = pretrain_model_path)

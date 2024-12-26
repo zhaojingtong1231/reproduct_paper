@@ -5,6 +5,7 @@
   @Email: 2665109868@qq.com
   @function
 """
+import argparse
 from datetime import datetime
 def get_time_str():
     # 获取当前日期和时间
@@ -18,9 +19,25 @@ def get_time_str():
     formatted_str = f"{month:02d}_{day:02d}_{hour:02d}_{minute:02d}"
     return formatted_str
 from txgnn import TxData, TxGNN, TxEval
-seed = 22
+
+
+parser = argparse.ArgumentParser(description='TxGNN_prompt')
+parser.add_argument(
+    "--split",
+    type=str,
+    default="random",
+    choices=['random', 'complex_disease', 'disease_eval', 'cell_proliferation', 'mental_health', 'cardiovascular',
+             'anemia', 'adrenal_gland', 'autoimmune', 'metabolic_disorder', 'diabetes', 'neurodigenerative',
+             'full_graph', 'downstream_pred', 'few_edeges_to_kg', 'few_edeges_to_indications'],  # 指定合法的候选项
+    help="Choose the data split type"
+)
+parser.add_argument("--seed", type=int, default=12,
+                    help="random seed")
+args = parser.parse_args()
+split = args.split
+seed = args.seed
 TxData = TxData(data_folder_path = '/data/zhaojingtong/PrimeKG/data_all')
-TxData.prepare_split(split = 'random', seed = seed, no_kg = False)
+TxData.prepare_split(split = split, seed = seed, no_kg = False)
 
 TxGNN = TxGNN(data = TxData,
               weight_bias_track = False,
@@ -28,13 +45,12 @@ TxGNN = TxGNN(data = TxData,
               exp_name = 'TxGNN'
               )
 import os
-# to load a pretrained model:
-# TxGNN.load_pretrained('./model_ckpt')
+
 lr = 0.001
 time_str = get_time_str()
 model_save_path = '/data/zhaojingtong/PrimeKG/TxGNN'
 model_save_path = os.path.join(model_save_path,
-                             f"time{time_str}seed{seed}")
+                               f"lr{lr}_batch{1024}_epochs{2}_hidden{512}_split{split}_time{time_str}_seed{seed}")
 os.makedirs(model_save_path, exist_ok=True)
 TxGNN.model_initialize(n_hid = 512,
                       n_inp = 512,
@@ -55,8 +71,4 @@ TxGNN.pretrain(n_epoch = 2,
                batch_size = 1024,
                train_print_per_n = 1000,
                save_model_path = model_save_path)
-## here as a demo, the n_epoch is set to 30. Change it to n_epoch = 500 when you use it
-TxGNN.finetune(n_epoch = 500,
-               learning_rate = 5e-4,
-               train_print_per_n = 100,
-               valid_per_n = 100,)
+

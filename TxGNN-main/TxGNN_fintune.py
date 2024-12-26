@@ -5,62 +5,60 @@
   @Email: 2665109868@qq.com
   @function
 """
-"""
-  -*- encoding: utf-8 -*-
-  @Author: zhaojingtong
-  @Time  : 2024/11/17 17:18
-  @Email: 2665109868@qq.com
-  @function
-"""
-from datetime import datetime
-def get_time_str():
-    # 获取当前日期和时间
-    now = datetime.now()
-    # 提取月、日、小时和分钟
-    month = now.month
-    day = now.day
-    hour = now.hour
-    minute = now.minute
-    # 将提取的信息格式化为用下划线隔开的字符串
-    formatted_str = f"{month:02d}_{day:02d}_{hour:02d}_{minute:02d}"
-    return formatted_str
-from txgnn import TxData, TxGNN, TxEval
-seed = 22
-TxData = TxData(data_folder_path = '/data/zhaojingtong/PrimeKG/data_all')
-TxData.prepare_split(split = 'random', seed = seed, no_kg = False)
-
-TxGNN = TxGNN(data = TxData,
-              weight_bias_track = False,
-              proj_name = 'TxGNN',
-              exp_name = 'TxGNN'
-              )
+from txgnn import TxData, TxGNN
+import gc  # 引入垃圾回收模块
 import os
-# to load a pretrained model:
-# TxGNN.load_pretrained('./model_ckpt')
-lr = 0.001
-time_str = get_time_str()
-model_save_path = '/data/zhaojingtong/PrimeKG/TxGNN'
-model_save_path = os.path.join(model_save_path,
-                             f"time{time_str}seed{seed}")
-# os.makedirs(model_save_path, exist_ok=True)
-TxGNN.model_initialize(n_hid = 512,
-                      n_inp = 512,
-                      n_out = 512,
-                      proto = True,
-                      proto_num = 3,
-                      attention = False,
-                      sim_measure = 'all_nodes_profile',
-                      bert_measure = 'disease_name',
-                      agg_measure = 'rarity',
-                      num_walks = 200,
-                      walk_mode = 'bit',
-                      path_length = 2)
+import re
+import glob
+# 设置根目录路径
+base_dir = "/data/zhaojingtong/PrimeKG/TxGNN"
+TxData = TxData(data_folder_path='/data/zhaojingtong/PrimeKG/data_all')
 
-## here we did not run this, since the output is too long to fit into the notebook
-model_path = '/data/zhaojingtong/PrimeKG/TxGNN/time12_03_15_53seed22/model.pth'
-## here as a demo, the n_epoch is set to 30. Change it to n_epoch = 500 when you use it
-TxGNN.finetune(n_epoch = 500,
-               learning_rate = 5e-4,
-               train_print_per_n = 100,
-               valid_per_n = 100,
-               model_path = model_path)
+# 遍历 TxGNN 目录下所有子目录中的 model.pth 文件
+for model_path in glob.glob(os.path.join(base_dir, "**/model.pth"), recursive=True):
+    print(f"Processing: {model_path}")
+    model_path = model_path
+    save_result_path = os.path.dirname(model_path)
+    match = re.search(r"split(.*?)_t", model_path)
+    split = match.group(1)
+    if split == 'random':
+        seed = int(save_result_path[-2:])
+    else:
+        seed = int(save_result_path[-1:])
+
+    TxData.prepare_split(split=split, seed=seed, no_kg=False)
+
+    # 创建 TxGNN 实例
+    TxGNN_instance = TxGNN(
+        data=TxData,
+        weight_bias_track=False,
+        proj_name='TxGNN',
+        exp_name='TxGNN'
+    )
+    TxGNN_instance.model_initialize(
+        n_hid=512,
+        n_inp=512,
+        n_out=512,
+        proto=True,
+        proto_num=3,
+        attention=False,
+        sim_measure='all_nodes_profile',
+        bert_measure='disease_name',
+        agg_measure='rarity',
+        num_walks=200,
+        walk_mode='bit',
+        path_length=2
+    )
+
+    TxGNN_instance.finetune(
+        n_epoch=1000,
+        learning_rate=5e-4,
+        train_print_per_n=500,
+        valid_per_n=500,
+        model_path=model_path,
+        save_result_path=save_result_path
+    )
+
+    # 删除实例并清理内存
+    del TxGNN_instance
+    gc.collect()  # 垃圾回收

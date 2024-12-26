@@ -572,30 +572,30 @@ def get_all_metrics_fb(pred_score_pos, pred_score_neg, scores, labels, G, full_m
 
     auroc_rel = {}
     auprc_rel = {}
-    
-    if full_mode:
-        etypes = G.canonical_etypes
-    else:
-        etypes = [('drug', 'contraindication', 'disease'), 
-                  ('drug', 'indication', 'disease'), 
-                  ('drug', 'off-label use', 'disease'),
-                  ('disease', 'rev_contraindication', 'drug'), 
-                  ('disease', 'rev_indication', 'drug'), 
-                  ('disease', 'rev_off-label use', 'drug')]
-        
+
+    # if full_mode:
+    #     etypes = G.canonical_etypes
+    # else:
+    #     etypes = [('drug', 'contraindication', 'disease'),
+    #               ('drug', 'indication', 'disease'),
+    #               ('drug', 'off-label use', 'disease'),
+    #               ('disease', 'rev_contraindication', 'drug'),
+    #               ('disease', 'rev_indication', 'drug'),
+    #               ('disease', 'rev_off-label use', 'drug')]
+    etypes = G.canonical_etypes
     for etype in etypes:
-        
+
         try:
             out_pos = pred_score_pos[etype].reshape(-1,).detach().cpu().numpy()
             out_neg = pred_score_neg[etype].reshape(-1,).detach().cpu().numpy()
             pred_ = np.concatenate((out_pos, out_neg))
             y_ = [1]*len(out_pos) + [0]*len(out_neg)
-        
+
             auroc_rel[etype] = roc_auc_score(y_, pred_)
             auprc_rel[etype] = average_precision_score(y_, pred_)
         except:
             pass
-    
+
     micro_auroc = roc_auc_score(labels, scores)
     micro_auprc = average_precision_score(labels, scores)
     macro_auroc = np.mean(list(auroc_rel.values()))
@@ -606,29 +606,29 @@ def get_all_metrics_fb(pred_score_pos, pred_score_neg, scores, labels, G, full_m
 
 
 def evaluate(model, valid_data, G):
-    model.eval()    
-    logits_valid, rels = model(G, valid_data) 
-    scores = torch.sigmoid(logits_valid) 
+    model.eval()
+    logits_valid, rels = model(G, valid_data)
+    scores = torch.sigmoid(logits_valid)
     return get_all_metrics(valid_data.label.values, scores.cpu().detach().numpy(), rels)
 
 def evaluate_fb(model, g_pos, g_neg, G, dd_etypes, device, return_embed = False, mode = 'valid'):
     model.eval()
     pred_score_pos, pred_score_neg, pos_score, neg_score = model(G, g_neg, g_pos, pretrain_mode = False, mode = mode)
-    
+
     pos_score = torch.cat([pred_score_pos[i] for i in dd_etypes])
     neg_score = torch.cat([pred_score_neg[i] for i in dd_etypes])
-    
+
     scores = torch.sigmoid(torch.cat((pos_score, neg_score)).reshape(-1,))
     labels = [1] * len(pos_score) + [0] * len(neg_score)
     loss = F.binary_cross_entropy(scores, torch.Tensor(labels).float().to(device))
-            
+
     if return_embed:
         return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, G, True), loss.item(), pred_score_pos, pred_score_neg
     else:
         return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, G, True), loss.item()
-    
-    
-    
+
+
+
 def evaluate_gnnexplainer(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes_train, penalty_scaling, device, mode = 'validation', weight_bias_track = False, wandb = None):
     loss_fct = nn.MSELoss()
     model.eval()
@@ -651,8 +651,8 @@ def evaluate_gnnexplainer(model, G, g_valid_pos, g_valid_neg, only_relation, epo
         loss_pred_ori = F.binary_cross_entropy(original_predictions, torch.Tensor(labels).float().to(device)).item()
 
         loss = loss_fct(original_predictions, updated_predictions)
-        total_loss = loss + penalty * penalty_scaling        
-        
+        total_loss = loss + penalty * penalty_scaling
+
         print("----- " + mode + " Result -----")
         print("Running epoch {0:n} of GNNExplainer training. Mean divergence={1:.4f}, mean penalty={2:.4f}, bce_update={3:.4f}, bce_original={4:.4f}, num_masked_l1={5:.4f}, num_masked_l2={6:.4f}".format(
             epoch,
@@ -664,8 +664,8 @@ def evaluate_gnnexplainer(model, G, g_valid_pos, g_valid_neg, only_relation, epo
             num_masked[1]/G.number_of_edges())
         )
         return float(loss.item()) + float((penalty * penalty_scaling).item())
-    
-    
+
+
 def evaluate_graphmask(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes_train, allowance, penalty_scaling, device, mode = 'validation', weight_bias_track = False, wandb = None, no_base = False):
     model.eval()
     G = G.to(device)
@@ -703,7 +703,7 @@ def evaluate_graphmask(model, G, g_valid_pos, g_valid_neg, only_relation, epoch,
 
         g_valid_pos = g_valid_pos.to('cpu')
         g_valid_neg = g_valid_neg.to('cpu')
-        
+
         print("----- " + mode + " Result -----")
         print("Epoch {0:n}, Mean divergence={1:.4f}, mean penalty={2:.4f}, bce_update={3:.4f}, bce_original={4:.4f}, num_masked_l1={5:.4f}, num_masked_l2={6:.4f}".format(
             epoch,
@@ -715,20 +715,20 @@ def evaluate_graphmask(model, G, g_valid_pos, g_valid_neg, only_relation, epoch,
             num_masked[1]/G.number_of_edges())
         )
         print("-------------------------------")
-        
+
         if mode == 'testing':
             test_metrics = {}
             pred_update = updated_predictions.detach().cpu().numpy()
             pred_ori = original_predictions.detach().cpu().numpy()
             y_ = np.array(labels)
-            
+
             test_metrics['test auroc original'] = roc_auc_score(y_, pred_ori)
             test_metrics['test auprc original'] = average_precision_score(y_, pred_ori)
             test_metrics['test auroc update'] = roc_auc_score(y_, pred_update)
             test_metrics['test auprc update'] = average_precision_score(y_, pred_update)
             test_metrics['test %masked_L1'] = num_masked[0]/G.number_of_edges()
             test_metrics['test %masked_L2'] = num_masked[1]/G.number_of_edges()
-            
+
         if weight_bias_track:
             wandb.log({mode + ' divergence': float(loss.mean().item()),
                        mode + ' penalty': float(f),
@@ -743,8 +743,8 @@ def evaluate_graphmask(model, G, g_valid_pos, g_valid_neg, only_relation, epoch,
         return g_ + f_ , test_metrics
     else:
         return g_ + f_
-    
-    
+
+
 def evaluate_ib(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes_train, allowance, penalty_scaling, device, mode = 'validation', weight_bias_track = False, wandb = None, no_base = False):
     model.eval()
     G = G.to(device)
@@ -782,7 +782,7 @@ def evaluate_ib(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes
 
         g_valid_pos = g_valid_pos.to('cpu')
         g_valid_neg = g_valid_neg.to('cpu')
-        
+
         print("----- " + mode + " Result -----")
         print("Epoch {0:n}, Mean divergence={1:.4f}, mean penalty={2:.4f}, bce_update={3:.4f}, bce_original={4:.4f}, num_masked_l1={5:.4f}, num_masked_l2={6:.4f}".format(
             epoch,
@@ -794,20 +794,20 @@ def evaluate_ib(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes
             num_masked[1]/G.number_of_edges())
         )
         print("-------------------------------")
-        
+
         if mode == 'testing':
             test_metrics = {}
             pred_update = updated_predictions.detach().cpu().numpy()
             pred_ori = original_predictions.detach().cpu().numpy()
             y_ = np.array(labels)
-            
+
             test_metrics['test auroc original'] = roc_auc_score(y_, pred_ori)
             test_metrics['test auprc original'] = average_precision_score(y_, pred_ori)
             test_metrics['test auroc update'] = roc_auc_score(y_, pred_update)
             test_metrics['test auprc update'] = average_precision_score(y_, pred_update)
             test_metrics['test %masked_L1'] = num_masked[0]/G.number_of_edges()
             test_metrics['test %masked_L2'] = num_masked[1]/G.number_of_edges()
-            
+
         if weight_bias_track:
             wandb.log({mode + ' divergence': float(loss.mean().item()),
                        mode + ' penalty': float(f),
@@ -822,19 +822,19 @@ def evaluate_ib(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes
         return g_ + f_ , test_metrics
     else:
         return g_ + f_
-    
+
 def evaluate_mb(model, g_pos, g_neg, G, dd_etypes, device, return_embed = False, mode = 'valid'):
     model.eval()
     #model = model.to('cpu')
     pred_score_pos, pred_score_neg, pos_score, neg_score = model.forward_minibatch(g_pos.to(device), g_neg.to(device), [G.to(device), G.to(device)], G.to(device), mode = mode, pretrain_mode = False)
-    
+
     pos_score = torch.cat([pred_score_pos[i] for i in dd_etypes])
     neg_score = torch.cat([pred_score_neg[i] for i in dd_etypes])
-    
+
     scores = torch.sigmoid(torch.cat((pos_score, neg_score)).reshape(-1,))
     labels = [1] * len(pos_score) + [0] * len(neg_score)
     loss = F.binary_cross_entropy(scores, torch.Tensor(labels).float().to(device))
-    
+
     model = model.to(device)
     if return_embed:
         return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1,).detach().cpu().numpy(), labels, G, True), loss.item(), pred_score_pos, pred_score_neg
@@ -848,12 +848,16 @@ def disable_all_gradients(module):
 
 def print_dict(x, dd_only = True):
     if dd_only:
-        etypes = [('drug', 'contraindication', 'disease'), 
-                  ('drug', 'indication', 'disease'), 
+        etypes = [('drug', 'contraindication', 'disease'),
+                  ('drug', 'indication', 'disease'),
                   ('drug', 'off-label use', 'disease'),
-                  ('disease', 'rev_contraindication', 'drug'), 
-                  ('disease', 'rev_indication', 'drug'), 
-                  ('disease', 'rev_off-label use', 'drug')]
+                  ('disease', 'rev_contraindication', 'drug'),
+                  ('disease', 'rev_indication', 'drug'),
+                  ('disease', 'rev_off-label use', 'drug'),
+                  ('gene/protein', 'protein_protein', 'gene/protein'),
+                  ('disease', 'disease_disease', 'disease'),
+                  ('drug', 'drug_protein', 'gene/protein'),
+                  ('gene/protein', 'disease_protein', 'disease')]
         
         for i in etypes:
             print(str(i) + ': ' + str(x[i]))

@@ -151,12 +151,12 @@ def random_fold(df, fold_seed, frac):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac = val_frac/(1-test_frac), replace = False, random_state = 1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test)        
-        
-    return {'train': df_train.reset_index(drop = True), 
-            'valid': df_valid.reset_index(drop = True), 
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid, val])
+        df_test = pd.concat([df_test, test])
+
+    return {'train': df_train.reset_index(drop = True),
+            'valid': df_valid.reset_index(drop = True),
             'test': df_test.reset_index(drop = True)}
 
 def disease_eval_fold(df, fold_seed, disease_idx):
@@ -164,47 +164,47 @@ def disease_eval_fold(df, fold_seed, disease_idx):
         disease_idx = np.array([disease_idx])
     else:
         disease_idx = np.array(disease_idx)
-        
+
     dd_rel_types = ['contraindication', 'indication', 'off-label use']
     df_not_dd = df[~df.relation.isin(dd_rel_types)]
     df_dd = df[df.relation.isin(dd_rel_types)]
-    
+
     unique_diseases = df_dd.y_idx.unique()
-   
+
     # remove the unique disease out of training
     train_diseases = np.setdiff1d(unique_diseases, disease_idx)
-    df_dd_train_val = df_dd[df_dd.y_idx.isin(train_diseases)]                               
+    df_dd_train_val = df_dd[df_dd.y_idx.isin(train_diseases)]
     df_dd_test = df_dd[df_dd.y_idx.isin(disease_idx)]
-    
-    # randomly get 5% disease-drug pairs for validation 
+
+    # randomly get 5% disease-drug pairs for validation
     df_dd_val = df_dd_train_val.sample(frac = 0.05, replace = False, random_state = fold_seed)
     df_dd_train = df_dd_train_val[~df_dd_train_val.index.isin(df_dd_val.index)]
-                                       
+
     df_train = pd.concat([df_not_dd, df_dd_train])
     df_valid = df_dd_val
-    df_test = df_dd_test                               
-                                   
+    df_test = df_dd_test
+
     #np.random.seed(fold_seed)
     #np.random.shuffle(unique_diseases)
     #train, valid = np.split(unique_diseases, int(0.95*len(unique_diseases)))
-    return {'train': df_train.reset_index(drop = True), 
-            'valid': df_valid.reset_index(drop = True), 
-            'test': df_test.reset_index(drop = True)}                      
+    return {'train': df_train.reset_index(drop = True),
+            'valid': df_valid.reset_index(drop = True),
+            'test': df_test.reset_index(drop = True)}
 
 def complex_disease_fold(df, fold_seed, frac):
     dd_rel_types = ['contraindication', 'indication', 'off-label use']
     df_not_dd = df[~df.relation.isin(dd_rel_types)]
-    df_dd = df[df.relation.isin(dd_rel_types)] 
-    
+    df_dd = df[df.relation.isin(dd_rel_types)]
+
     unique_diseases = df_dd.y_idx.unique()
     np.random.seed(fold_seed)
     np.random.shuffle(unique_diseases)
     train, valid, test = np.split(unique_diseases, [int(frac[0]*len(unique_diseases)), int((frac[0] + frac[1])*len(unique_diseases))])
-    
+
     df_dd_train = df_dd[df_dd.y_idx.isin(train)]
     df_dd_valid = df_dd[df_dd.y_idx.isin(valid)]
     df_dd_test = df_dd[df_dd.y_idx.isin(test)]
-    
+
     df = df_not_dd
     train_frac, val_frac, test_frac = frac
     df_train = pd.DataFrame()
@@ -217,24 +217,24 @@ def complex_disease_fold(df, fold_seed, frac):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac = val_frac/(1-test_frac), replace = False, random_state = 1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test) 
-    
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid, val])
+        df_test = pd.concat([df_test, test])
+
     df_train = pd.concat([df_train, df_dd_train])
     df_valid = pd.concat([df_valid, df_dd_valid])
     df_test = pd.concat([df_test, df_dd_test])
-    
-    return {'train': df_train.reset_index(drop = True), 
-            'valid': df_valid.reset_index(drop = True), 
+
+    return {'train': df_train.reset_index(drop = True),
+            'valid': df_valid.reset_index(drop = True),
             'test': df_test.reset_index(drop = True)}
-        
+
 def few_edeges_to_kg_fold(df, fold_seed, frac):
-    
+
     dd_rel_types = ['contraindication', 'indication', 'off-label use']
     df_not_dd = df[~df.relation.isin(dd_rel_types)]
     df_dd = df[df.relation.isin(dd_rel_types)]
-    
+
     disease2num_neighbors_1 = dict(df_not_dd[df_not_dd.x_type == 'disease'].groupby('x_idx').y_id.agg(len))
     disease2num_neighbors_2 = dict(df_not_dd[df_not_dd.y_type == 'disease'].groupby('y_idx').x_id.agg(len))
 
@@ -243,7 +243,7 @@ def few_edeges_to_kg_fold(df, fold_seed, frac):
     # Iterating through keys in both dictionaries
     for key in set(disease2num_neighbors_1).union(disease2num_neighbors_2):
         disease2num_neighbors[key] = disease2num_neighbors_1.get(key, 0) + disease2num_neighbors_2.get(key, 0)
-    
+
     disease_with_less_than_3_connections_in_kg = np.array([i for i,j in disease2num_neighbors.items() if j <= 3])
     unique_diseases = df_dd.y_idx.unique()
     train_val_diseases = np.setdiff1d(unique_diseases, disease_with_less_than_3_connections_in_kg)
@@ -254,11 +254,11 @@ def few_edeges_to_kg_fold(df, fold_seed, frac):
     train, valid = np.split(train_val_diseases, [int(frac[0]*len(unique_diseases))])
     print('Number of train diseases: ', len(train))
     print('Number of valid diseases: ', len(valid))
-    
+
     df_dd_train = df_dd[df_dd.y_idx.isin(train)]
     df_dd_valid = df_dd[df_dd.y_idx.isin(valid)]
     df_dd_test = df_dd[df_dd.y_idx.isin(test)]
-    
+
     df = df_not_dd
     train_frac, val_frac, test_frac = frac
     df_train = pd.DataFrame()
@@ -271,27 +271,27 @@ def few_edeges_to_kg_fold(df, fold_seed, frac):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac = val_frac/(1-test_frac), replace = False, random_state = 1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test) 
-    
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid, val])
+        df_test = pd.concat([df_test, test])
+
     df_train = pd.concat([df_train, df_dd_train])
     df_valid = pd.concat([df_valid, df_dd_valid])
     df_test = pd.concat([df_test, df_dd_test])
-    
-    return {'train': df_train.reset_index(drop = True), 
-            'valid': df_valid.reset_index(drop = True), 
+
+    return {'train': df_train.reset_index(drop = True),
+            'valid': df_valid.reset_index(drop = True),
             'test': df_test.reset_index(drop = True)}
-    
-    
+
+
 def few_edeges_to_indications_fold(df, fold_seed, frac):
-    
+
     dd_rel_types = ['contraindication', 'indication', 'off-label use']
     df_not_dd = df[~df.relation.isin(dd_rel_types)]
     df_dd = df[df.relation.isin(dd_rel_types)]
-    
+
     disease2num_indications = dict(df_dd[(df_dd.y_type == 'disease') & (df_dd.relation == 'indication')].groupby('x_idx').y_id.agg(len))
-    
+
     disease_with_less_than_3_indications_in_kg = np.array([i for i,j in disease2num_indications.items() if j <= 3])
     unique_diseases = df_dd.y_idx.unique()
     train_val_diseases = np.setdiff1d(unique_diseases, disease_with_less_than_3_indications_in_kg)
@@ -302,11 +302,11 @@ def few_edeges_to_indications_fold(df, fold_seed, frac):
     train, valid = np.split(train_val_diseases, [int(frac[0]*len(unique_diseases))])
     print('Number of train diseases: ', len(train))
     print('Number of valid diseases: ', len(valid))
-    
+
     df_dd_train = df_dd[df_dd.y_idx.isin(train)]
     df_dd_valid = df_dd[df_dd.y_idx.isin(valid)]
     df_dd_test = df_dd[df_dd.y_idx.isin(test)]
-    
+
     df = df_not_dd
     train_frac, val_frac, test_frac = frac
     df_train = pd.DataFrame()
@@ -319,44 +319,44 @@ def few_edeges_to_indications_fold(df, fold_seed, frac):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac = val_frac/(1-test_frac), replace = False, random_state = 1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test) 
-    
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid, val])
+        df_test = pd.concat([df_test, test])
+
     df_train = pd.concat([df_train, df_dd_train])
     df_valid = pd.concat([df_valid, df_dd_valid])
     df_test = pd.concat([df_test, df_dd_test])
-    
-    return {'train': df_train.reset_index(drop = True), 
-            'valid': df_valid.reset_index(drop = True), 
+
+    return {'train': df_train.reset_index(drop = True),
+            'valid': df_valid.reset_index(drop = True),
             'test': df_test.reset_index(drop = True)}
-    
+
 def create_fold_cv(df, split_num, num_splits):
     dd_rel_types = ['contraindication', 'indication', 'off-label use']
     df_not_dd = df[~df.relation.isin(dd_rel_types)]
-    df_dd = df[df.relation.isin(dd_rel_types)] 
-    
+    df_dd = df[df.relation.isin(dd_rel_types)]
+
     unique_diseases = df_dd.y_idx.unique()
     np.random.seed(42)
     np.random.shuffle(unique_diseases)
-    
+
     from sklearn.model_selection import KFold
     kf = KFold(n_splits=num_splits)
-    
+
     split_num_idx = {}
-    
+
     for i, (train_index, test_index) in enumerate(kf.split(unique_diseases)):
         train_index, valid_index, _ = np.split(train_index, [int(0.9*len(train_index)), int(len(train_index))])
         split_num_idx[i+1] = {'train': unique_diseases[train_index],
                               'valid': unique_diseases[valid_index],
                               'test': unique_diseases[test_index]
                              }
-        
+
     train, valid, test = split_num_idx[split_num]['train'], split_num_idx[split_num]['valid'], split_num_idx[split_num]['test']
     df_dd_train = df_dd[df_dd.y_idx.isin(train)]
     df_dd_valid = df_dd[df_dd.y_idx.isin(valid)]
     df_dd_test = df_dd[df_dd.y_idx.isin(test)]
-    
+
     df = df_not_dd
     train_frac, val_frac, test_frac = [0.83125, 0.11875, 0.05]
     df_train = pd.DataFrame()
@@ -369,9 +369,9 @@ def create_fold_cv(df, split_num, num_splits):
         train_val = df_temp[~df_temp.index.isin(test.index)]
         val = train_val.sample(frac = val_frac/(1-test_frac), replace = False, random_state = 1)
         train = train_val[~train_val.index.isin(val.index)]
-        df_train = df_train.append(train)
-        df_valid = df_valid.append(val)
-        df_test = df_test.append(test) 
+        df_train = pd.concat([df_train, train])
+        df_valid = pd.concat([df_valid, val])
+        df_test = pd.concat([df_test, test])
     
     df_train = pd.concat([df_train, df_dd_train])
     df_valid = pd.concat([df_valid, df_dd_valid])

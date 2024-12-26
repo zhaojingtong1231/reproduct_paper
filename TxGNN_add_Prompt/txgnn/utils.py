@@ -606,15 +606,16 @@ def get_all_metrics_fb(pred_score_pos, pred_score_neg, scores, labels, G, full_m
     auroc_rel = {}
     auprc_rel = {}
 
-    if full_mode:
-        etypes = G.canonical_etypes
-    else:
-        etypes = [('drug', 'contraindication', 'disease'),
-                  ('drug', 'indication', 'disease'),
-                  ('drug', 'off-label use', 'disease'),
-                  ('disease', 'rev_contraindication', 'drug'),
-                  ('disease', 'rev_indication', 'drug'),
-                  ('disease', 'rev_off-label use', 'drug')]
+    # if full_mode:
+    #     etypes = G.canonical_etypes
+    # else:
+    #     etypes = [('drug', 'contraindication', 'disease'),
+    #               ('drug', 'indication', 'disease'),
+    #               ('drug', 'off-label use', 'disease'),
+    #               ('disease', 'rev_contraindication', 'drug'),
+    #               ('disease', 'rev_indication', 'drug'),
+    #               ('disease', 'rev_off-label use', 'drug')]
+    etypes = G.canonical_etypes
 
     for etype in etypes:
 
@@ -666,7 +667,6 @@ def evaluate_fb(model, g_pos, g_neg, G, dd_etypes, device, return_embed=False, m
 def evaluate_fb_prompt(feature_prompt,model, g_pos, g_neg, G, dd_etypes, device, return_embed=False, mode='valid'):
     model.eval()
     pred_score_pos, pred_score_neg, pos_score, neg_score = model.forward_prompt(feature_prompt,G, g_neg, g_pos, pretrain_mode=False, mode=mode)
-
     pos_score = torch.cat([pred_score_pos[i] for i in dd_etypes])
     neg_score = torch.cat([pred_score_neg[i] for i in dd_etypes])
 
@@ -676,10 +676,10 @@ def evaluate_fb_prompt(feature_prompt,model, g_pos, g_neg, G, dd_etypes, device,
 
     if return_embed:
         return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels,
-                                  G, True), loss.item(), pred_score_pos, pred_score_neg
+                                  G, full_mode=True), loss.item(), pred_score_pos, pred_score_neg
     else:
         return get_all_metrics_fb(pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels,
-                                  G, True), loss.item()
+                                  G, full_mode=True), loss.item()
 
 
 def evaluate_gnnexplainer(model, G, g_valid_pos, g_valid_neg, only_relation, epoch, etypes_train, penalty_scaling,
@@ -934,14 +934,18 @@ def disable_all_gradients(module):
         param.requires_grad = False
 
 
-def print_dict(x, dd_only=True):
+def print_dict(x, dd_only=False):
     if dd_only:
         etypes = [('drug', 'contraindication', 'disease'),
-                  ('drug', 'indication', 'disease'),
-                  ('drug', 'off-label use', 'disease'),
-                  ('disease', 'rev_contraindication', 'drug'),
-                  ('disease', 'rev_indication', 'drug'),
-                  ('disease', 'rev_off-label use', 'drug')]
+                          ('drug', 'indication', 'disease'),
+                          ('drug', 'off-label use', 'disease'),
+                          ('disease', 'rev_contraindication', 'drug'),
+                          ('disease', 'rev_indication', 'drug'),
+                          ('disease', 'rev_off-label use', 'drug'),
+                          ('gene/protein', 'protein_protein', 'gene/protein'),
+                          ('disease', 'disease_disease', 'disease'),
+                          ('drug', 'drug_protein', 'gene/protein'),
+                  ('gene/protein', 'disease_protein', 'disease')]
 
         for i in etypes:
             print(str(i) + ': ' + str(x[i]))
