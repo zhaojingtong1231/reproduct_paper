@@ -235,10 +235,10 @@ class TxGNNPrompt:
                        valid_per_n = 25,
                        sweep_wandb = None,
                        save_name = None,
-                 model_save_path = './',
+                 model_path = './',
                  save_result_path ='./'):
 
-        self.model.load_state_dict(torch.load(model_save_path))
+        self.model.load_state_dict(torch.load(model_path))
         self.model = self.model.to(self.device)
         self.G = self.G.to(self.device)
         neg_sampler = Full_Graph_NegSampler(self.G, 1, 'fix_dst', self.device)
@@ -333,6 +333,8 @@ class TxGNNPrompt:
                     print('----------------------------------------------')
 
                 sys.stdout = sys.__stdout__
+                checkpoint_path = os.path.join(save_result_path, f'fintune_model.pth')
+                torch.save(self.best_model.state_dict(), checkpoint_path)
 
     def predict_all_class(self,model_save_path='./'):
 

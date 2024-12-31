@@ -288,7 +288,7 @@ class TxGNN:
 
             del pred_score_pos, pred_score_neg, scores, labels
 
-        with open(save_result_path + "/result.txt", "a") as f:
+        with open(save_result_path + "/result.txt", "w") as f:
             # Redirect stdout to the file
             sys.stdout = f
             print('Testing...')
@@ -315,9 +315,9 @@ class TxGNN:
 
             # Reset stdout back to the console after the block
         sys.stdout = sys.__stdout__
+        checkpoint_path = os.path.join(save_result_path, f'fintune_model.pth')
+        torch.save(self.best_model.state_dict(), checkpoint_path)
 
-        
-        
     def save_model(self, path):
         if not os.path.exists(path):
             os.mkdir(path)

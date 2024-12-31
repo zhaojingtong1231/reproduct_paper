@@ -44,7 +44,7 @@ if __name__ == '__main__':
     lr = args.lr
     time_str = get_time_str()
     split = args.split
-    model_save_path = '/data/zhaojingtong/PrimeKG/test'
+    model_save_path = '/data/zhaojingtong/PrimeKG/our'
     model_save_path = os.path.join(model_save_path,
                              f"lr{lr}_batch{batch_size}_epochs{epochs}_hidden{hidden_dim}_split{split}_time{time_str}_seed{seed}")
 

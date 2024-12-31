@@ -5,74 +5,90 @@
   @Email: 2665109868@qq.com
   @function
 """
-from txgnn import TxData, TxGNNPrompt, TxEval
+
 import torch
-import argparse
+from txgnn import TxData, TxGNNPrompt
+import gc  # 引入垃圾回收模块
 import os
-from txgnn.utils import get_time_str
 import re
-if __name__ == '__main__':
+import glob
+# 设置根目录路径
+base_dir = "/data/zhaojingtong/PrimeKG/our"
+TxData = TxData(data_folder_path='/data/zhaojingtong/PrimeKG/data_all')
 
-    parser = argparse.ArgumentParser(description='TxGNN_prompt')
-    parser.add_argument("--gpu", type=int, default=1,
-                        help="which GPU to use. Set -1 to use CPU.")
-    parser.add_argument("--num-hidden", type=int, default=512,
-                        help="number of hidden units")
-    parser.add_argument("--epochs", type=int, default=50,
-                        help="number of pretrain.sh epochs")
-    parser.add_argument("--seed", type=int, default=12,
-                        help="random seed")
-    parser.add_argument("--batch-size", type=int, default=2048,
-                        help="loader small_data")
-    parser.add_argument("--lr", type=float, default=0.001,
-                        help="learning rate")
-    parser.add_argument(
-        "--split",
-        type=str,
-        default="random",
-        choices=['random', 'complex_disease', 'disease_eval', 'cell_proliferation', 'mental_health', 'cardiovascular', 'anemia', 'adrenal_gland','autoimmune', 'metabolic_disorder', 'diabetes', 'neurodigenerative', 'full_graph', 'downstream_pred', 'few_edeges_to_kg', 'few_edeges_to_indications'],  # 指定合法的候选项
-        help="Choose the data split type"
-    )
-    model_path = '/data/zhaojingtong/PrimeKG/our/random/lr0.001_batch1024_epochs30_hidden512_splitrandom_time12_22_16_56_seed12/model4_0.pth'
-    save_result_path = os.path.dirname(model_path)
-    seed = int(save_result_path[-2:])
+# 遍历 TxGNN 目录下所有子目录中的 model.pth 文件
+for subfolder1 in glob.glob(os.path.join(base_dir, "*")):
+    # 遍历每个子文件夹
+    for subfolder in glob.glob(os.path.join(subfolder1, "*")):
+        if os.path.isdir(subfolder):
+            # 初始化最大数字和对应的文件路径
+            max_num = -1
+            best_model_path = None
 
-    match = re.search(r'split([a-zA-Z]+)_', save_result_path)
-    split = match.group(1)
+            # 遍历当前子文件夹下的所有模型文件
+            for model_path in glob.glob(os.path.join(subfolder, "**/model*.pth"), recursive=True):
+                # 提取文件名中的数字部分
+                filename = os.path.basename(model_path)
 
-    args = parser.parse_args()
-    gpu_id = args.gpu # 选择你想使用的 GPU ID，例如 0, 1, 2 等
-    hidden_dim = args.num_hidden
-    epochs = args.epochs
-    batch_size = args.batch_size
-    lr = args.lr
-    time_str = get_time_str()
+                # 使用正则表达式提取文件名中的所有数字
+                try:
+                    num_parts = [int(part) for part in filter(str.isdigit, filename)]
+                    if len(num_parts) == 2:  # 假设文件名格式为 modelX_Y.pth
+                        # 先比较数字的高位（5），然后比较低位（0）
+                        num = num_parts[0] * 1000 + num_parts[1]  # 可以根据实际需要调整数字权重
+                    else:
+                        num = num_parts[0]
+                except ValueError:
+                    continue  # 如果提取失败，跳过此文件
+
+                # 更新最大数字和路径
+                if num > max_num:
+                    max_num = num
+                    best_model_path = model_path
 
 
-    device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
-    TxData = TxData(data_folder_path = '/data/zhaojingtong/PrimeKG/data_all')
-    TxData.prepare_split(split = split, seed = seed, no_kg = False)
+            model_path = best_model_path
+            print(model_path)
+            save_result_path = os.path.dirname(model_path)
+            match = re.search(r"split(.*?)_t", model_path)
+            split = match.group(1)
+            if split == 'random':
+                seed = int(save_result_path[-2:])
+            else:
+                seed = int(save_result_path[-1:])
 
-    TxGNN = TxGNNPrompt(data = TxData,
-                  weight_bias_track = False,
-                  proj_name = 'TxGNNPrompt',
-                  exp_name = 'TxGNNPrompt',
-                  device=device)
+            TxData.prepare_split(split=split, seed=seed, no_kg=False)
+            device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+            # 创建 TxGNN 实例
+            TxGNN_instance = TxGNNPrompt(data=TxData,
+                                weight_bias_track=False,
+                                proj_name='TxGNNPrompt',
+                                exp_name='TxGNNPrompt',
+                                device=device)
 
-    TxGNN.model_initialize(n_hid = hidden_dim,
-                          n_inp = hidden_dim,
-                          n_out = hidden_dim,
-                          proto = True,
-                          proto_num = 3,
-                          sim_measure = 'protein_profile',
-                          bert_measure = 'disease_name',
-                          agg_measure = 'rarity',
-                          num_walks = 200,
-                          walk_mode = 'bit',
-                          path_length = 2)
+            TxGNN_instance.model_initialize(
+                n_hid=512,
+                n_inp=512,
+                n_out=512,
+                proto=True,
+                proto_num=3,
+                sim_measure='all_nodes_profile',
+                bert_measure='disease_name',
+                agg_measure='rarity',
+                num_walks=200,
+                walk_mode='bit',
+                path_length=2
+            )
 
-    TxGNN.finetune(n_epoch = 1000,
-                   learning_rate = 5e-4,
-                   train_print_per_n = 100,
-                   valid_per_n = 100,
-                   model_save_path = model_path,save_result_path =save_result_path)
+            TxGNN_instance.finetune(
+                n_epoch=3000,
+                learning_rate=5e-4,
+                train_print_per_n=500,
+                valid_per_n=500,
+                model_path=model_path,
+                save_result_path=save_result_path
+            )
+
+            # 删除实例并清理内存
+            del TxGNN_instance
+            gc.collect()  # 垃圾回收
