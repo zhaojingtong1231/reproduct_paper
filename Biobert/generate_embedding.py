@@ -6,10 +6,6 @@
   @function
 """
 
-
-
-
-
 from transformers import BertModel, BertTokenizer
 import re
 

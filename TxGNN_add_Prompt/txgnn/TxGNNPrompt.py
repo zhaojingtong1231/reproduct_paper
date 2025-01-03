@@ -242,7 +242,7 @@ class TxGNNPrompt:
         self.model = self.model.to(self.device)
         self.G = self.G.to(self.device)
         neg_sampler = Full_Graph_NegSampler(self.G, 1, 'fix_dst', self.device)
-        torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
+        # torch.nn.init.xavier_uniform(self.model.w_rels) # reinitialize decoder
 
         params = [param for key, param in self.model.prompt.items() if isinstance(param, nn.Parameter)]
         optimizer = torch.optim.AdamW(params + list(self.model.pred.parameters()), lr = learning_rate)
@@ -299,42 +299,37 @@ class TxGNNPrompt:
                 print('----------------------------------------------')
 
             del pred_score_pos, pred_score_neg, scores, labels
+        with open(save_result_path + "/result.txt", "w") as f:
 
-            if (epoch) % valid_per_n == 0:
 
-                with open(save_result_path + "/result.txt", "a") as f:
-                    # Redirect stdout to the file
-                    sys.stdout = f
-                    print('Testing...')
-                    self.best_model = self.model
-                    # (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
-                    #  macro_auprc), loss, pred_pos, pred_neg = evaluate_fb_prompt(feature_prompt, self.best_model,
-                    #                                                              self.g_test_pos, self.g_test_neg,
-                    #                                                              self.G, self.dd_etypes, self.device,
-                    #                                                              True, mode='test')
-                    with torch.no_grad():
-                        (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
-                         macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
-                                                                              self.g_test_neg, self.G, self.dd_etypes,
-                                                                              self.device, True, mode='test')
-                    print(
-                        'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
-                            loss,
-                            micro_auroc,
-                            micro_auprc,
-                            macro_auroc,
-                            macro_auprc
-                        ))
 
-                    print('----- AUROC Performance in Each Relation -----')
-                    print_dict(auroc_rel, dd_only=True)
-                    print('----- AUPRC Performance in Each Relation -----')
-                    print_dict(auprc_rel, dd_only=True)
-                    print('----------------------------------------------')
+            # Redirect stdout to the file
+            sys.stdout = f
+            print('Testing...')
 
-                sys.stdout = sys.__stdout__
-                checkpoint_path = os.path.join(save_result_path, f'fintune_model.pth')
-                torch.save(self.best_model.state_dict(), checkpoint_path)
+            with torch.no_grad():
+                (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
+                 macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
+                                                                      self.g_test_neg, self.G, self.dd_etypes,
+                                                                      self.device, True, mode='test')
+            print(
+                'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
+                    loss,
+                    micro_auroc,
+                    micro_auprc,
+                    macro_auroc,
+                    macro_auprc
+                ))
+
+            print('----- AUROC Performance in Each Relation -----')
+            print_dict(auroc_rel, dd_only=True)
+            print('----- AUPRC Performance in Each Relation -----')
+            print_dict(auprc_rel, dd_only=True)
+            print('----------------------------------------------')
+
+            sys.stdout = sys.__stdout__
+            checkpoint_path = os.path.join(save_result_path, f'fintune_model.pth')
+            torch.save(self.model.state_dict(), checkpoint_path)
 
     def predict_all_class(self,model_save_path='./'):
 
