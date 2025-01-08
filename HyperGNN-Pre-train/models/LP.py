@@ -25,8 +25,8 @@ class Lp_heter(nn.Module):
 
         # h_1 = self.hetero_conv1(batch.x_dict, batch.edge_index_dict,batch,edge_type)
         # h_1 = hetero_conv(batch.x_dict, batch.edge_index_dict)
-        h_1 = hetero_conv(batch)
-        # h_1 = hetero_conv(batch.x_dict, batch.edge_index_dict,batch,edge_type)
+        # h_1 = hetero_conv(batch)
+        h_1 = hetero_conv(batch.x_dict, batch.edge_index_dict,batch)
 
         h1  = {key: F.leaky_relu(h[0])  for key, h in h_1.items()}
 

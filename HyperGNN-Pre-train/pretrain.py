@@ -21,8 +21,8 @@ class Pretrain(nn.Module):
         super(Pretrain, self).__init__()
 
         # self.hetero_conv = HGTlayer(data=data,hidden_channels=128, num_heads=2, num_layers=1)
-        self.hetero_conv = HeteroConvLayers(data=data, hidden_dim=hidden_dim, num_layers_num=num_layers_num, dropout=dropout)
-        # self.hetero_conv = HGT(data=data,hidden_channels=128, num_heads=2, num_layers=1)
+        # self.hetero_conv = HeteroConvLayers(data=data, hidden_dim=hidden_dim, num_layers_num=num_layers_num, dropout=dropout)
+        self.hetero_conv = HGT(data=data,hidden_channels=128, num_heads=2, num_layers=1)
 
 
         self.dgi = DGI_heter(hidden_dim=hidden_dim)
@@ -66,14 +66,7 @@ class Pretrain(nn.Module):
                 data1,aug1edge_index1,aug1edge_index2,msk, samp_bias1, samp_bias2,aug_type,labels,edge_type,batch,lp):
 
 
-        # logits_dgi = self.dgi(self.hetero_conv,data,neg_data, aug_features1edge, aug_features2edge, msk, samp_bias1, samp_bias2)
 
-        # logits_graphcl = self.graphcledge(self.hetero_conv,data,neg_data, aug_features1edge, aug_features2edge,data1,aug1edge_index1,aug1edge_index2,msk, samp_bias1, samp_bias2,aug_type=aug_type)
-
-        # dgi_loss = self.Heter_BCEWithLogitsLoss(logits_dgi,labels)
-
-        # graphcl_loss = self.Heter_BCEWithLogitsLoss(logits_graphcl,labels)
-        graphcl_loss = 0
 
 
 

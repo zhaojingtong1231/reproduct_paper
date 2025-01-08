@@ -1,0 +1,121 @@
+python HAN.py --edge=0 --seed=12 --epochs=20 --split random
+python HAN.py --edge=0 --seed=22 --epochs=20 --split random
+python HAN.py --edge=0 --seed=32 --epochs=20 --split random
+python HAN.py --edge=0 --seed=42 --epochs=20 --split random
+python HAN.py --edge=0 --seed=52 --epochs=20 --split random
+python HAN.py --edge=1 --seed=12 --epochs=20 --split random
+python HAN.py --edge=1 --seed=22 --epochs=20 --split random
+python HAN.py --edge=1 --seed=32 --epochs=20 --split random
+python HAN.py --edge=1 --seed=42 --epochs=20 --split random
+python HAN.py --edge=1 --seed=52 --epochs=20 --split random
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split complex_disease
+python HAN.py --edge=0 --seed=2 --epochs=10 --split complex_disease
+python HAN.py --edge=0 --seed=3 --epochs=10 --split complex_disease
+python HAN.py --edge=0 --seed=4 --epochs=10 --split complex_disease
+python HAN.py --edge=0 --seed=5 --epochs=10 --split complex_disease
+python HAN.py --edge=1 --seed=1 --epochs=10 --split complex_disease
+python HAN.py --edge=1 --seed=2 --epochs=10 --split complex_disease
+python HAN.py --edge=1 --seed=3 --epochs=10 --split complex_disease
+python HAN.py --edge=1 --seed=4 --epochs=10 --split complex_disease
+python HAN.py --edge=1 --seed=5 --epochs=10 --split complex_disease
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split cell_proliferation
+python HAN.py --edge=0 --seed=2 --epochs=10 --split cell_proliferation
+python HAN.py --edge=0 --seed=3 --epochs=10 --split cell_proliferation
+python HAN.py --edge=0 --seed=4 --epochs=10 --split cell_proliferation
+python HAN.py --edge=0 --seed=5 --epochs=10 --split cell_proliferation
+python HAN.py --edge=1 --seed=1 --epochs=10 --split cell_proliferation
+python HAN.py --edge=1 --seed=2 --epochs=10 --split cell_proliferation
+python HAN.py --edge=1 --seed=3 --epochs=10 --split cell_proliferation
+python HAN.py --edge=1 --seed=4 --epochs=10 --split cell_proliferation
+python HAN.py --edge=1 --seed=5 --epochs=10 --split cell_proliferation
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split mental_health
+python HAN.py --edge=0 --seed=2 --epochs=10 --split mental_health
+python HAN.py --edge=0 --seed=3 --epochs=10 --split mental_health
+python HAN.py --edge=0 --seed=4 --epochs=10 --split mental_health
+python HAN.py --edge=0 --seed=5 --epochs=10 --split mental_health
+python HAN.py --edge=1 --seed=1 --epochs=10 --split mental_health
+python HAN.py --edge=1 --seed=2 --epochs=10 --split mental_health
+python HAN.py --edge=1 --seed=3 --epochs=10 --split mental_health
+python HAN.py --edge=1 --seed=4 --epochs=10 --split mental_health
+python HAN.py --edge=1 --seed=5 --epochs=10 --split mental_health
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split cardiovascular
+python HAN.py --edge=0 --seed=2 --epochs=10 --split cardiovascular
+python HAN.py --edge=0 --seed=3 --epochs=10 --split cardiovascular
+python HAN.py --edge=0 --seed=4 --epochs=10 --split cardiovascular
+python HAN.py --edge=0 --seed=5 --epochs=10 --split cardiovascular
+python HAN.py --edge=1 --seed=1 --epochs=10 --split cardiovascular
+python HAN.py --edge=1 --seed=2 --epochs=10 --split cardiovascular
+python HAN.py --edge=1 --seed=3 --epochs=10 --split cardiovascular
+python HAN.py --edge=1 --seed=4 --epochs=10 --split cardiovascular
+python HAN.py --edge=1 --seed=5 --epochs=10 --split cardiovascular
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split anemia
+python HAN.py --edge=0 --seed=2 --epochs=10 --split anemia
+python HAN.py --edge=0 --seed=3 --epochs=10 --split anemia
+python HAN.py --edge=0 --seed=4 --epochs=10 --split anemia
+python HAN.py --edge=0 --seed=5 --epochs=10 --split anemia
+python HAN.py --edge=1 --seed=1 --epochs=10 --split anemia
+python HAN.py --edge=1 --seed=2 --epochs=10 --split anemia
+python HAN.py --edge=1 --seed=3 --epochs=10 --split anemia
+python HAN.py --edge=1 --seed=4 --epochs=10 --split anemia
+python HAN.py --edge=1 --seed=5 --epochs=10 --split anemia
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split adrenal_gland
+python HAN.py --edge=0 --seed=2 --epochs=10 --split adrenal_gland
+python HAN.py --edge=0 --seed=3 --epochs=10 --split adrenal_gland
+python HAN.py --edge=0 --seed=4 --epochs=10 --split adrenal_gland
+python HAN.py --edge=0 --seed=5 --epochs=10 --split adrenal_gland
+python HAN.py --edge=1 --seed=1 --epochs=10 --split adrenal_gland
+python HAN.py --edge=1 --seed=2 --epochs=10 --split adrenal_gland
+python HAN.py --edge=1 --seed=3 --epochs=10 --split adrenal_gland
+python HAN.py --edge=1 --seed=4 --epochs=10 --split adrenal_gland
+python HAN.py --edge=1 --seed=5 --epochs=10 --split adrenal_gland
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split autoimmune
+python HAN.py --edge=0 --seed=2 --epochs=10 --split autoimmune
+python HAN.py --edge=0 --seed=3 --epochs=10 --split autoimmune
+python HAN.py --edge=0 --seed=4 --epochs=10 --split autoimmune
+python HAN.py --edge=0 --seed=5 --epochs=10 --split autoimmune
+python HAN.py --edge=1 --seed=1 --epochs=10 --split autoimmune
+python HAN.py --edge=1 --seed=2 --epochs=10 --split autoimmune
+python HAN.py --edge=1 --seed=3 --epochs=10 --split autoimmune
+python HAN.py --edge=1 --seed=4 --epochs=10 --split autoimmune
+python HAN.py --edge=1 --seed=5 --epochs=10 --split autoimmune
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=0 --seed=2 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=0 --seed=3 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=0 --seed=4 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=0 --seed=5 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=1 --seed=1 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=1 --seed=2 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=1 --seed=3 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=1 --seed=4 --epochs=10 --split metabolic_disorder
+python HAN.py --edge=1 --seed=5 --epochs=10 --split metabolic_disorder
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split diabetes
+python HAN.py --edge=0 --seed=2 --epochs=10 --split diabetes
+python HAN.py --edge=0 --seed=3 --epochs=10 --split diabetes
+python HAN.py --edge=0 --seed=4 --epochs=10 --split diabetes
+python HAN.py --edge=0 --seed=5 --epochs=10 --split diabetes
+python HAN.py --edge=1 --seed=1 --epochs=10 --split diabetes
+python HAN.py --edge=1 --seed=2 --epochs=10 --split diabetes
+python HAN.py --edge=1 --seed=3 --epochs=10 --split diabetes
+python HAN.py --edge=1 --seed=4 --epochs=10 --split diabetes
+python HAN.py --edge=1 --seed=5 --epochs=10 --split diabetes
+
+python HAN.py --edge=0 --seed=1 --epochs=10 --split neurodigenerative
+python HAN.py --edge=0 --seed=2 --epochs=10 --split neurodigenerative
+python HAN.py --edge=0 --seed=3 --epochs=10 --split neurodigenerative
+python HAN.py --edge=0 --seed=4 --epochs=10 --split neurodigenerative
+python HAN.py --edge=0 --seed=5 --epochs=10 --split neurodigenerative
+python HAN.py --edge=1 --seed=1 --epochs=10 --split neurodigenerative
+python HAN.py --edge=1 --seed=2 --epochs=10 --split neurodigenerative
+python HAN.py --edge=1 --seed=3 --epochs=10 --split neurodigenerative
+python HAN.py --edge=1 --seed=4 --epochs=10 --split neurodigenerative
+python HAN.py --edge=1 --seed=5 --epochs=10 --split neurodigenerative
+

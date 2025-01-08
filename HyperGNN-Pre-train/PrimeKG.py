@@ -233,8 +233,8 @@ class PreData:
 
         print('Creating PyG graph....')
         #create pyg graph
-        g = process.create_pyg_graph(df_test,df)
-        g_valid_pos , g_valid_neg = evaluate_graph_construct(df_valid,g,'multinomial_dst', 1)
+        g = process.create_pyg_graph(df_train,df)
+        g_valid_pos , g_valid_neg = evaluate_graph_construct(df_test,g,'fix_dst', 1)
 
 
 
