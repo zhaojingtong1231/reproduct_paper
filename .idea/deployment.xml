@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="root@localhost:20022 agent" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@localhost:20022 password" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
+      <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:30200 key">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:30856 key">
         <serverdata>
           <mappings>
@@ -11,6 +18,20 @@
         </serverdata>
       </paths>
       <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:30856 key (2)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:30990 key">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:31834 key">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -35,6 +56,20 @@
         </serverdata>
       </paths>
       <paths name="paddle_user@112.53.86.218:10022 password (3)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="paddle_user@112.53.86.218:10022 password (4)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="paddle_user@112.53.86.218:10022 password (5)">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -90,7 +125,28 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="root@localhost:10022 agent (7)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="root@localhost:20022 agent">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@localhost:20022 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@localhost:20022 password (2)">
         <serverdata>
           <mappings>
             <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />

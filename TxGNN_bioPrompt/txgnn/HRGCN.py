@@ -143,7 +143,6 @@ class HRGCN(nn.Module):
         h_dict = self.layer1(blocks[0], input_dict)
         h_dict = {k: F.leaky_relu(h) for k, h in h_dict.items()}
         h = self.layer2(blocks[1], h_dict)
-
         if lp:
             return h
         else:
