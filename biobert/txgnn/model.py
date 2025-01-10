@@ -35,13 +35,22 @@ class DistMultPredictor(nn.Module):
         self.device = device
         self.W = w_rels
         self.rel2idx = rel2idx
-        self.etypes_dd = [('drug', 'contraindication', 'disease'), 
+        self.etypes_dd = [('drug', 'contraindication', 'disease'),
+                          ('drug', 'indication', 'disease'),
+                          ('drug', 'off-label use', 'disease'),
+                          ('disease', 'rev_contraindication', 'drug'),
+                          ('disease', 'rev_indication', 'drug'),
+                          ('disease', 'rev_off-label use', 'drug')]
+        self.etypes_all = [('drug', 'contraindication', 'disease'),
                            ('drug', 'indication', 'disease'),
                            ('drug', 'off-label use', 'disease'),
-                           ('disease', 'rev_contraindication', 'drug'), 
+                           ('disease', 'rev_contraindication', 'drug'),
                            ('disease', 'rev_indication', 'drug'),
-                           ('disease', 'rev_off-label use', 'drug')]
-        
+                           ('disease', 'rev_off-label use', 'drug'),
+                           ('gene/protein', 'protein_protein', 'gene/protein'),
+                           ('disease', 'disease_disease', 'disease'),
+                           ('drug', 'drug_protein', 'gene/protein'),
+                           ('gene/protein', 'disease_protein', 'disease')]
         self.node_types_dd = ['disease', 'drug']
         # 定义一个用于处理每个关系的MLP
         self.mlp = nn.Sequential(
@@ -141,101 +150,162 @@ class DistMultPredictor(nn.Module):
                     out = torch.sigmoid(graph.edges[etype].data['score'])
                     s_l.append(out)
                     scores[etype] = out
+
             else:
                 # finetuning on drug disease only...
-                
-                for etype in etypes_train:
 
-                    if self.proto:
-                        src, dst = etype[0], etype[2]
-                        src_rel_idx = torch.where(graph.out_degrees(etype=etype) != 0)
-                        dst_rel_idx = torch.where(graph.in_degrees(etype=etype) != 0)
-                        src_h = h[src][src_rel_idx]
-                        dst_h = h[dst][dst_rel_idx]
+                for etype in self.etypes_all:
+                    if etype in self.etypes_dd:
+                        if self.proto:
+                            src, dst = etype[0], etype[2]
+                            src_rel_idx = torch.where(graph.out_degrees(etype=etype) != 0)
+                            dst_rel_idx = torch.where(graph.in_degrees(etype=etype) != 0)
+                            src_h = h[src][src_rel_idx]
+                            dst_h = h[dst][dst_rel_idx]
 
-                        src_rel_ids_keys = torch.where(G.out_degrees(etype=etype) != 0)
-                        dst_rel_ids_keys = torch.where(G.in_degrees(etype=etype) != 0)
-                        src_h_keys = h[src][src_rel_ids_keys]
-                        dst_h_keys = h[dst][dst_rel_ids_keys]
+                            src_rel_ids_keys = torch.where(G.out_degrees(etype=etype) != 0)
+                            dst_rel_ids_keys = torch.where(G.in_degrees(etype=etype) != 0)
+                            src_h_keys = h[src][src_rel_ids_keys]
+                            dst_h_keys = h[dst][dst_rel_ids_keys]
 
-                        h_disease = {}
+                            h_disease = {}
 
-                        if src == 'disease':
-                            h_disease['disease_query'] = src_h
-                            h_disease['disease_key'] = src_h_keys
-                            h_disease['disease_query_id'] = src_rel_idx
-                            h_disease['disease_key_id'] = src_rel_ids_keys
-                        elif dst == 'disease':
-                            h_disease['disease_query'] = dst_h
-                            h_disease['disease_key'] = dst_h_keys
-                            h_disease['disease_query_id'] = dst_rel_idx
-                            h_disease['disease_key_id'] = dst_rel_ids_keys
+                            if src == 'disease':
+                                h_disease['disease_query'] = src_h
+                                h_disease['disease_key'] = src_h_keys
+                                h_disease['disease_query_id'] = src_rel_idx
+                                h_disease['disease_key_id'] = src_rel_ids_keys
+                            elif dst == 'disease':
+                                h_disease['disease_query'] = dst_h
+                                h_disease['disease_key'] = dst_h_keys
+                                h_disease['disease_query_id'] = dst_rel_idx
+                                h_disease['disease_key_id'] = dst_rel_ids_keys
 
-                        if self.sim_measure in ['protein_profile', 'all_nodes_profile', 'protein_random_walk', 'bert', 'profile+bert', 'all_nodes_profile_more']:
+                            if self.sim_measure in ['protein_profile', 'all_nodes_profile', 'protein_random_walk',
+                                                    'bert', 'profile+bert', 'all_nodes_profile_more']:
 
-                            try:
-                                sim = self.sim_all_etypes[etype][np.array([self.diseaseid2id_etypes[etype][i.item()] for i in h_disease['disease_query_id'][0]])]
-                            except:
-                                
-                                disease_etypes = ['disease_disease', 'rev_disease_protein']
-                                disease_nodes = ['disease', 'gene/protein']
-                                disease_etypes_all = ['disease_disease', 'rev_disease_protein', 'disease_phenotype_positive', 'rev_exposure_disease']
-                                disease_nodes_all = ['disease', 'gene/protein', 'effect/phenotype', 'exposure']
-                                ## new disease not seen in the training set
-                                for i in h_disease['disease_query_id'][0]:
-                                    if i.item() not in self.diseases_profile_etypes[etype]:
-                                        if self.sim_measure == 'all_nodes_profile':
-                                            self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(G, i, disease_etypes, disease_nodes)
-                                        elif self.sim_measure == 'all_nodes_profile_more':
-                                            self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(G, i, disease_etypes_all, disease_nodes_all)    
-                                        elif self.sim_measure == 'protein_profile':
-                                            self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(G, i, ['rev_disease_protein'], ['gene/protein'])
-                                        elif self.sim_measure == 'protein_random_walk':
-                                            self.diseases_profile_etypes[etype][i.item()] = obtain_protein_random_walk_profile(i, self.num_walks, self.path_length, G, disease_etypes, disease_nodes, self.walk_mode)
-                                            
-                                profile_query = [self.diseases_profile_etypes[etype][i.item()] for i in h_disease['disease_query_id'][0]]
-                                profile_query = torch.cat(profile_query).view(len(profile_query), -1)
+                                try:
+                                    sim = self.sim_all_etypes[etype][np.array(
+                                        [self.diseaseid2id_etypes[etype][i.item()] for i in
+                                         h_disease['disease_query_id'][0]])]
+                                except:
 
-                                profile_keys = [self.diseases_profile_etypes[etype][i.item()] for i in h_disease['disease_key_id'][0]]
-                                profile_keys = torch.cat(profile_keys).view(len(profile_keys), -1)
+                                    disease_etypes = ['disease_disease', 'rev_disease_protein']
+                                    disease_nodes = ['disease', 'gene/protein']
+                                    disease_etypes_all = ['disease_disease', 'rev_disease_protein',
+                                                          'disease_phenotype_positive', 'rev_exposure_disease']
+                                    disease_nodes_all = ['disease', 'gene/protein', 'effect/phenotype', 'exposure']
+                                    ## new disease not seen in the training set
+                                    for i in h_disease['disease_query_id'][0]:
+                                        if i.item() not in self.diseases_profile_etypes[etype]:
+                                            if self.sim_measure == 'all_nodes_profile':
+                                                self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(
+                                                    G, i, disease_etypes, disease_nodes)
+                                            elif self.sim_measure == 'all_nodes_profile_more':
+                                                self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(
+                                                    G, i, disease_etypes_all, disease_nodes_all)
+                                            elif self.sim_measure == 'protein_profile':
+                                                self.diseases_profile_etypes[etype][i.item()] = obtain_disease_profile(
+                                                    G, i, ['rev_disease_protein'], ['gene/protein'])
+                                            elif self.sim_measure == 'protein_random_walk':
+                                                self.diseases_profile_etypes[etype][
+                                                    i.item()] = obtain_protein_random_walk_profile(i, self.num_walks,
+                                                                                                   self.path_length, G,
+                                                                                                   disease_etypes,
+                                                                                                   disease_nodes,
+                                                                                                   self.walk_mode)
+                                            elif self.sim_measure == 'bert':
+                                                self.diseases_profile_etypes[etype][i.item()] = torch.Tensor(
+                                                    self.bert_embed[self.id2bertindex[self.disease_dict[i.item()]]])
+                                            elif self.sim_measure == 'profile+bert':
+                                                self.diseases_profile_etypes[etype][i.item()] = torch.cat((
+                                                                                                          obtain_disease_profile(
+                                                                                                              G, i,
+                                                                                                              disease_etypes,
+                                                                                                              disease_nodes),
+                                                                                                          torch.Tensor(
+                                                                                                              self.bert_embed[
+                                                                                                                  self.id2bertindex[
+                                                                                                                      self.disease_dict[
+                                                                                                                          i.item()]]])))
 
-                                sim = sim_matrix(profile_query, profile_keys)
+                                    profile_query = [self.diseases_profile_etypes[etype][i.item()] for i in
+                                                     h_disease['disease_query_id'][0]]
+                                    profile_query = torch.cat(profile_query).view(len(profile_query), -1)
 
-                            if src_h.shape[0] == src_h_keys.shape[0]:
-                                ## during training...
-                                coef = torch.topk(sim, self.k + 1).values[:, 1:]
-                                coef = F.normalize(coef, p=1, dim=1)
-                                embed = h_disease['disease_key'][torch.topk(sim, self.k + 1).indices[:, 1:]]
+                                    profile_keys = [self.diseases_profile_etypes[etype][i.item()] for i in
+                                                    h_disease['disease_key_id'][0]]
+                                    profile_keys = torch.cat(profile_keys).view(len(profile_keys), -1)
+
+                                    sim = sim_matrix(profile_query, profile_keys)
+
+                                if src_h.shape[0] == src_h_keys.shape[0]:
+                                    ## during training...
+                                    coef = torch.topk(sim, self.k + 1).values[:, 1:]
+                                    coef = F.normalize(coef, p=1, dim=1)
+                                    embed = h_disease['disease_key'][torch.topk(sim, self.k + 1).indices[:, 1:]]
+                                else:
+                                    ## during evaluation...
+                                    coef = torch.topk(sim, self.k).values[:, :]
+                                    coef = F.normalize(coef, p=1, dim=1)
+                                    embed = h_disease['disease_key'][torch.topk(sim, self.k).indices[:, :]]
+                                out = torch.mul(embed, coef.unsqueeze(dim=2).to(self.device)).sum(dim=1)
+
+                            if self.sim_measure in ['protein_profile', 'all_nodes_profile', 'all_nodes_profile_more',
+                                                    'protein_random_walk', 'bert', 'profile+bert']:
+                                # for protein profile, we are only looking at diseases for now...
+                                if self.agg_measure == 'learn':
+                                    coef_all = self.m(
+                                        self.W_gate['disease'](torch.cat((h_disease['disease_query'], out), dim=1)))
+                                    proto_emb = (1 - coef_all) * h_disease['disease_query'] + coef_all * out
+                                elif self.agg_measure == 'heuristics-0.8':
+                                    proto_emb = 0.8 * h_disease['disease_query'] + 0.2 * out
+                                elif self.agg_measure == 'avg':
+                                    proto_emb = 0.5 * h_disease['disease_query'] + 0.5 * out
+                                elif self.agg_measure == 'rarity':
+                                    if src == 'disease':
+                                        coef_all = exponential(G.out_degrees(etype=etype)[
+                                                                   torch.where(graph.out_degrees(etype=etype) != 0)],
+                                                               self.exp_lambda).reshape(-1, 1)
+                                    elif dst == 'disease':
+                                        coef_all = exponential(
+                                            G.in_degrees(etype=etype)[torch.where(graph.in_degrees(etype=etype) != 0)],
+                                            self.exp_lambda).reshape(-1, 1)
+                                    proto_emb = (1 - coef_all) * h_disease['disease_query'] + coef_all * out
+                                elif self.agg_measure == '100proto':
+                                    proto_emb = out
+                                h['disease'][h_disease['disease_query_id']] = proto_emb
                             else:
-                                ## during evaluation...
-                                coef = torch.topk(sim, self.k).values[:, :]
-                                coef = F.normalize(coef, p=1, dim=1)
-                                embed = h_disease['disease_key'][torch.topk(sim, self.k).indices[:, :]]
-                            out = torch.mul(embed, coef.unsqueeze(dim = 2).to(self.device)).sum(dim = 1)
+                                if self.agg_measure == 'learn':
+                                    coef_src = self.m(self.W_gate[src](torch.cat((src_h, sim_emb_src), dim=1)))
+                                    coef_dst = self.m(self.W_gate[dst](torch.cat((dst_h, sim_emb_dst), dim=1)))
+                                elif self.agg_measure == 'rarity':
+                                    # give high weights to proto embeddings for nodes that have low degrees
+                                    coef_src = exponential(
+                                        G.out_degrees(etype=etype)[torch.where(graph.out_degrees(etype=etype) != 0)],
+                                        self.exp_lambda).reshape(-1, 1)
+                                    coef_dst = exponential(
+                                        G.in_degrees(etype=etype)[torch.where(graph.in_degrees(etype=etype) != 0)],
+                                        self.exp_lambda).reshape(-1, 1)
+                                elif self.agg_measure == 'heuristics-0.8':
+                                    coef_src = 0.2
+                                    coef_dst = 0.2
+                                elif self.agg_measure == 'avg':
+                                    coef_src = 0.5
+                                    coef_dst = 0.5
+                                elif self.agg_measure == '100proto':
+                                    coef_src = 1
+                                    coef_dst = 1
 
-                        if self.sim_measure in ['protein_profile', 'all_nodes_profile', 'all_nodes_profile_more', 'protein_random_walk', 'bert', 'profile+bert']:
-                            # for protein profile, we are only looking at diseases for now...
-                            if self.agg_measure == 'learn':
-                                coef_all = self.m(self.W_gate['disease'](torch.cat((h_disease['disease_query'], out), dim = 1)))
-                                proto_emb = (1 - coef_all)*h_disease['disease_query'] + coef_all*out
-                            elif self.agg_measure == 'heuristics-0.8':
-                                proto_emb = 0.8*h_disease['disease_query'] + 0.2*out
-                            elif self.agg_measure == 'avg':
-                                proto_emb = 0.5*h_disease['disease_query'] + 0.5*out
-                            elif self.agg_measure == 'rarity':
-                                if src == 'disease':
-                                    coef_all = exponential(G.out_degrees(etype=etype)[torch.where(graph.out_degrees(etype=etype) != 0)], self.exp_lambda).reshape(-1, 1)
-                                elif dst == 'disease':
-                                    coef_all = exponential(G.in_degrees(etype=etype)[torch.where(graph.in_degrees(etype=etype) != 0)], self.exp_lambda).reshape(-1, 1)
-                                proto_emb = (1 - coef_all)*h_disease['disease_query'] + coef_all*out
-                            elif self.agg_measure == '100proto':
-                                proto_emb = out
-                            h['disease'][h_disease['disease_query_id']] = proto_emb
+                                proto_emb_src = (1 - coef_src) * src_h + coef_src * sim_emb_src
+                                proto_emb_dst = (1 - coef_dst) * dst_h + coef_dst * sim_emb_dst
 
+                                h[src][src_rel_idx] = proto_emb_src
+                                h[dst][dst_rel_idx] = proto_emb_dst
 
-                        graph.ndata['h'] = h
+                            graph.ndata['h'] = h
 
-                    graph.apply_edges(self.apply_edges, etype=etype)    
+                    graph.apply_edges(self.apply_edges, etype=etype)
                     out = graph.edges[etype].data['score']
                     s_l.append(out)
                     scores[etype] = out
@@ -244,12 +314,11 @@ class DistMultPredictor(nn.Module):
                         # recover back to the original embeddings for other relations
                         h[src][src_rel_idx] = src_h
                         h[dst][dst_rel_idx] = dst_h
-                
-                
+
             if pretrain_mode:
-                s_l = torch.cat(s_l)             
-            else: 
-                s_l = torch.cat(s_l).reshape(-1,).detach().cpu().numpy()
+                s_l = torch.cat(s_l)
+            else:
+                s_l = torch.cat(s_l).reshape(-1, ).detach().cpu().numpy()
             return scores, s_l
 
 
@@ -294,11 +363,11 @@ class HeteroRGCN(nn.Module):
     def forward_minibatch(self, pos_G, neg_G, blocks, G, mode = 'train', pretrain_mode = False):
 
         h  = self.hrgcn(blocks)
-        h_1 = {key: h * self.prompt[key] for key, h in h.items()}
+        # h_1 = {key: h * self.prompt[key] for key, h in h.items()}
 
 
-        scores, out_pos = self.pred(pos_G, G, h_1, pretrain_mode, mode=mode + '_pos', block=blocks[1])
-        scores_neg, out_neg = self.pred(neg_G, G, h_1, pretrain_mode, mode=mode + '_neg', block=blocks[1])
+        scores, out_pos = self.pred(pos_G, G, h, pretrain_mode, mode=mode + '_pos', block=blocks[1])
+        scores_neg, out_neg = self.pred(neg_G, G, h, pretrain_mode, mode=mode + '_neg', block=blocks[1])
 
         return scores, scores_neg, out_pos, out_neg
 
@@ -306,18 +375,12 @@ class HeteroRGCN(nn.Module):
         with G.local_scope():
             input_dict = {ntype : G.nodes[ntype].data['inp'] for ntype in G.ntypes}
 
-
-
-
             h_dict = self.hrgcn.layer1(G, input_dict)
             h_dict = {k : F.leaky_relu(h) for k, h in h_dict.items()}
             h = self.hrgcn.layer2(G, h_dict)
-            h = {key: h * self.prompt[key] for key, h in h.items()}
 
             if return_h:
                 return h
-
-
             # full batch
             if eval_pos_G is not None:
                 # eval mode
@@ -328,28 +391,7 @@ class HeteroRGCN(nn.Module):
                 scores, out_pos = self.pred(G, G, h, pretrain_mode, mode = mode + '_pos')
                 scores_neg, out_neg = self.pred(neg_G, G, h, pretrain_mode, mode = mode + '_neg')
                 return scores, scores_neg, out_pos, out_neg
-    def forward_prompt(self, feature_prompt,G, neg_G, eval_pos_G = None, return_h = False, return_att = False, mode = 'train', pretrain_mode = False):
-        with G.local_scope():
-            input_dict = {ntype : G.nodes[ntype].data['inp'] for ntype in G.ntypes}
 
-            h_dict = self.hrgcn.layer1(G, input_dict)
-            h_dict = {k : F.leaky_relu(h) for k, h in h_dict.items()}
-            h = self.hrgcn.layer2(G, h_dict)
-            # h = {key: h * self.feature_prompt[key] for key, h in h.items()}
-            h = feature_prompt(h)
-            if return_h:
-                return h
-
-            # full batch
-            if eval_pos_G is not None:
-                # eval mode
-                scores, out_pos = self.pred(eval_pos_G, G, h, pretrain_mode, mode = mode + '_pos')
-                scores_neg, out_neg = self.pred(neg_G, G, h, pretrain_mode, mode = mode + '_neg')
-                return scores, scores_neg, out_pos, out_neg
-            else:
-                scores, out_pos = self.pred(G, G, h, pretrain_mode, mode = mode + '_pos')
-                scores_neg, out_neg = self.pred(neg_G, G, h, pretrain_mode, mode = mode + '_neg')
-                return scores, scores_neg, out_pos, out_neg
     
     def graphmask_forward(self, G, pos_graph, neg_graph, graphmask_mode = False, return_gates = False, only_relation = None, no_base = False):
                     

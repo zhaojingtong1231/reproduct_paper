@@ -1,0 +1,82 @@
+python biobert.py --seed=12 --epochs=20 --split random
+python biobert.py --seed=22 --epochs=20 --split random
+python biobert.py --seed=32 --epochs=20 --split random
+python biobert.py --seed=42 --epochs=20 --split random
+python biobert.py --seed=52 --epochs=20 --split random
+
+python biobert.py --seed=1 --epochs=20 --split complex_disease
+python biobert.py --seed=2 --epochs=20 --split complex_disease
+python biobert.py --seed=3 --epochs=20 --split complex_disease
+python biobert.py --seed=4 --epochs=20 --split complex_disease
+python biobert.py --seed=5 --epochs=20 --split complex_disease
+
+
+python biobert.py --seed=1 --epochs=20 --split cell_proliferation
+python biobert.py --seed=2 --epochs=20 --split cell_proliferation
+python biobert.py --seed=3 --epochs=20 --split cell_proliferation
+python biobert.py --seed=4 --epochs=20 --split cell_proliferation
+python biobert.py --seed=5 --epochs=20 --split cell_proliferation
+
+python biobert.py --seed=1 --epochs=20 --split mental_health
+python biobert.py --seed=2 --epochs=20 --split mental_health
+python biobert.py --seed=3 --epochs=20 --split mental_health
+python biobert.py --seed=4 --epochs=20 --split mental_health
+python biobert.py --seed=5 --epochs=20 --split mental_health
+
+python biobert.py --seed=1 --epochs=20 --split cardiovascular
+python biobert.py --seed=2 --epochs=20 --split cardiovascular
+python biobert.py --seed=3 --epochs=20 --split cardiovascular
+python biobert.py --seed=4 --epochs=20 --split cardiovascular
+python biobert.py --seed=5 --epochs=20 --split cardiovascular
+
+python biobert.py --seed=1 --epochs=20 --split anemia
+python biobert.py --seed=2 --epochs=20 --split anemia
+python biobert.py --seed=3 --epochs=20 --split anemia
+python biobert.py --seed=4 --epochs=20 --split anemia
+python biobert.py --seed=5 --epochs=20 --split anemia
+
+python biobert.py --seed=1 --epochs=20 --split adrenal_gland
+python biobert.py --seed=2 --epochs=20 --split adrenal_gland
+python biobert.py --seed=3 --epochs=20 --split adrenal_gland
+python biobert.py --seed=4 --epochs=20 --split adrenal_gland
+python biobert.py --seed=5 --epochs=20 --split adrenal_gland
+
+python biobert.py --seed=1 --epochs=20 --split autoimmune
+python biobert.py --seed=2 --epochs=20 --split autoimmune
+python biobert.py --seed=3 --epochs=20 --split autoimmune
+python biobert.py --seed=4 --epochs=20 --split autoimmune
+python biobert.py --seed=5 --epochs=20 --split autoimmune
+
+python biobert.py --seed=1 --epochs=20 --split metabolic_disorder
+python biobert.py --seed=2 --epochs=20 --split metabolic_disorder
+python biobert.py --seed=3 --epochs=20 --split metabolic_disorder
+python biobert.py --seed=4 --epochs=20 --split metabolic_disorder
+python biobert.py --seed=5 --epochs=20 --split metabolic_disorder
+
+python biobert.py --seed=1 --epochs=20 --split diabetes
+python biobert.py --seed=2 --epochs=20 --split diabetes
+python biobert.py --seed=3 --epochs=20 --split diabetes
+python biobert.py --seed=4 --epochs=20 --split diabetes
+python biobert.py --seed=5 --epochs=20 --split diabetes
+
+python biobert.py --seed=1 --epochs=20 --split neurodigenerative
+python biobert.py --seed=2 --epochs=20 --split neurodigenerative
+python biobert.py --seed=3 --epochs=20 --split neurodigenerative
+python biobert.py --seed=4 --epochs=20 --split neurodigenerative
+python biobert.py --seed=5 --epochs=20 --split neurodigenerative
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

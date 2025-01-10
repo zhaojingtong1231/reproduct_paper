@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="root@localhost:20022 password" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@localhost:20022 agent" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
       <paths name="ma-user@dev-modelarts-cnnortheast228.ccaicc.com:30200 key">
@@ -133,20 +133,6 @@
         </serverdata>
       </paths>
       <paths name="root@localhost:20022 agent">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@localhost:20022 password">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@localhost:20022 password (2)">
         <serverdata>
           <mappings>
             <mapping deploy="/z_work/code/reproduct_paper" local="$PROJECT_DIR$" />

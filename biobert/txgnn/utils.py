@@ -941,7 +941,11 @@ def print_dict(x, dd_only=True):
                   ('drug', 'off-label use', 'disease'),
                   ('disease', 'rev_contraindication', 'drug'),
                   ('disease', 'rev_indication', 'drug'),
-                  ('disease', 'rev_off-label use', 'drug')]
+                  ('disease', 'rev_off-label use', 'drug'),
+                  ('gene/protein', 'protein_protein', 'gene/protein'),
+                  ('disease', 'disease_disease', 'disease'),
+                  ('drug', 'drug_protein', 'gene/protein'),
+                  ('gene/protein', 'disease_protein', 'disease')]
 
         for i in etypes:
             print(str(i) + ': ' + str(x[i]))
