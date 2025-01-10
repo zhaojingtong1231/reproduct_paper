@@ -290,15 +290,15 @@ class HeteroRGCN(nn.Module):
     def forward_minibatch(self, pos_G, neg_G, blocks, G, mode = 'train', pretrain_mode = False):
 
         h  = self.hrgcn(blocks)
-        h_1 = {key: h + self.prompt[key] for key, h in h.items()}
-
-        logits_label_dgi = self.dgi(self.hrgcn, G, blocks)
-        dgi_loss = self.Heter_BCEWithLogitsLoss(logits_label_dgi)
+        # h_1 = {key: h + self.prompt[key] for key, h in h.items()}
+        h_1 = h
+        # logits_label_dgi = self.dgi(self.hrgcn, G, blocks)
+        # dgi_loss = self.Heter_BCEWithLogitsLoss(logits_label_dgi)
 
         scores, out_pos = self.pred(pos_G, G, h_1, pretrain_mode, mode=mode + '_pos', block=blocks[1])
         scores_neg, out_neg = self.pred(neg_G, G, h_1, pretrain_mode, mode=mode + '_neg', block=blocks[1])
 
-        return scores, scores_neg, out_pos, out_neg,dgi_loss
+        return scores, scores_neg, out_pos, out_neg
 
     def forward(self,G, neg_G, eval_pos_G = None, return_h = False, return_att = False, mode = 'train', pretrain_mode = False):
         with G.local_scope():
@@ -306,7 +306,7 @@ class HeteroRGCN(nn.Module):
             h_dict = self.hrgcn.layer1(G, input_dict)
             h_dict = {k : F.leaky_relu(h) for k, h in h_dict.items()}
             h = self.hrgcn.layer2(G, h_dict)
-            h = {key: h + self.prompt[key] for key, h in h.items()}
+            # h = {key: h + self.prompt[key] for key, h in h.items()}
             if return_h:
                 return h
             # full batch

@@ -156,7 +156,7 @@ class TxGNNPrompt:
                 blocks = [i.to(self.device) for i in blocks]
                 pos_g = pos_g.to(self.device)
                 neg_g = neg_g.to(self.device)
-                pred_score_pos, pred_score_neg, pos_score, neg_score, dgi_loss = self.model.forward_minibatch(pos_g,
+                pred_score_pos, pred_score_neg, pos_score, neg_score = self.model.forward_minibatch(pos_g,
                                                                                                               neg_g,
                                                                                                               blocks,
                                                                                                               self.G,
@@ -168,7 +168,7 @@ class TxGNNPrompt:
 
                 loss = F.binary_cross_entropy(scores, torch.Tensor(labels).float().to(self.device))
 
-                all_loss = 0.1 * dgi_loss + loss
+                all_loss = loss
 
                 optimizer.zero_grad()
                 all_loss.backward()
