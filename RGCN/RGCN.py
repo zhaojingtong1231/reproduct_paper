@@ -18,11 +18,11 @@ if __name__ == '__main__':
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--num-hidden", type=int, default=512,
                         help="number of hidden units")
-    parser.add_argument("--epochs", type=int, default=50,
+    parser.add_argument("--epochs", type=int, default=2,
                         help="number of pretrain.sh epochs")
     parser.add_argument("--seed", type=int, default=12,
                         help="random seed")
-    parser.add_argument("--batch-size", type=int, default=2048,
+    parser.add_argument("--batch-size", type=int, default=4096,
                         help="loader small_data")
     parser.add_argument("--lr", type=float, default=0.001,
                         help="learning rate")

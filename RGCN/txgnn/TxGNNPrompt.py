@@ -174,59 +174,39 @@ class TxGNNPrompt:
                 all_loss.backward()
                 optimizer.step()
 
-                if self.weight_bias_track:
-                    self.wandb.log({"Pretraining Loss": loss})
-                if (step) % train_print_per_n == 0:
 
-                    tauroc_rel, tauprc_rel, tmicro_auroc, tmicro_auprc, tmacro_auroc, tmacro_auprc = get_all_metrics_fb(
-                        pred_score_pos, pred_score_neg, scores.reshape(-1, ).detach().cpu().numpy(), labels, self.G,
-                        True)
+            with torch.no_grad():
+
+                # Open a text file in write mode
+                with open(save_model_path + "/result.txt", "a") as f:
+                    # Redirect stdout to the file
+                    sys.stdout = f
+                    print('Testing...'+str(epoch))
+
                     with torch.no_grad():
                         (auroc_rel, auprc_rel, micro_auroc, micro_auprc, macro_auroc,
                          macro_auprc), loss, pred_pos, pred_neg = evaluate_fb(self.model, self.g_test_pos,
-                                                                              self.g_test_neg, self.G, self.dd_etypes,
+                                                                              self.g_test_neg, self.G,
+                                                                              self.dd_etypes,
                                                                               self.device, True, mode='test')
-                    # Open a text file in write mode
-                    with open(save_model_path + "/output.txt", "a") as f:
-                        # Redirect stdout to the file
-                        sys.stdout = f
-                        print(
-                            'Epoch: %d Step: %d LR: %.5f Loss %.4f, Pretrain Micro AUROC %.4f Pretrain Micro AUPRC %.4f Pretrain Macro AUROC %.4f Pretrain Macro AUPRC %.4f' % (
-                                epoch,
-                                step,
-                                optimizer.param_groups[0]['lr'],
-                                loss,
-                                tmicro_auroc,
-                                tmicro_auprc,
-                                tmacro_auroc,
-                                tmacro_auprc
-                            ))
-                        # Now the following print statements will go to the file instead of the console
-                        print(
-                            'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
-                                loss,
-                                micro_auroc,
-                                micro_auprc,
-                                macro_auroc,
-                                macro_auprc
-                            ))
-                        print('----- AUROC Performance in Each Relation -----')
-                        print(auroc_rel)
-                        print('----- AUPRC Performance in Each Relation -----')
-                        print(auprc_rel)
+                    print(
+                        'Testing Loss %.4f Testing Micro AUROC %.4f Testing Micro AUPRC %.4f Testing Macro AUROC %.4f Testing Macro AUPRC %.4f' % (
+                            loss,
+                            micro_auroc,
+                            micro_auprc,
+                            macro_auroc,
+                            macro_auprc
+                        ))
 
+                    print('----- AUROC Performance in Each Relation -----')
+                    print_dict(auroc_rel, dd_only=True)
+                    print('----- AUPRC Performance in Each Relation -----')
+                    print_dict(auprc_rel, dd_only=True)
+                    print('----------------------------------------------')
 
-                    # Reset stdout back to the console after the block
                     sys.stdout = sys.__stdout__
-                    if macro_auprc > best_auprc:
-                        best_auprc = macro_auprc
-                        checkpoint_path = os.path.join(save_model_path, f'model{epoch}_{step}.pth')
-                        torch.save(self.model.state_dict(), checkpoint_path)
-                        best_models.append(os.path.join(save_model_path, f'model{epoch}_{step}.pth'))
-                        best_auprc_list.append(macro_auprc)
-                        if len(best_models) > 5:
-                            model_to_delete = best_models.pop(0)
-                            os.remove(model_to_delete)
+                    checkpoint_path = os.path.join(save_model_path, f'model.pth')
+                    torch.save(self.model.state_dict(), checkpoint_path)
 
 
     def finetune(self, n_epoch = 500,

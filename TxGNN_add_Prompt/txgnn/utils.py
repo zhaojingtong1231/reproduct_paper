@@ -1510,6 +1510,7 @@ def disease_centric_evaluation(df, df_train, df_valid, df_test, data_path, G, mo
                 device)
 
             model.eval()
+            print(g_eval)
             _, pred_score_rel, _, pred_score = model(G, g_eval)
             pred = pred_score_rel[('disease', rel, 'drug')].reshape(-1, ).detach().cpu().numpy()
             lab = {idx2id_drug[i]: labels[i] for i in g_eval.edges()[1].detach().cpu().numpy()}
@@ -1556,7 +1557,7 @@ def disease_centric_evaluation(df, df_train, df_valid, df_test, data_path, G, mo
         # downstream evaluate a specified list of diseases
         temp_d, preds_all, labels_all, metrics_all = {}, {}, {}, {}
 
-        rel_type = 'rev_' + relation
+        rel_type = relation
 
         preds_, labels_, drug_idxs, drug_names = get_scores_disease(rel_type, disease_ids)
         preds_all[rel_type], labels_all[rel_type] = preds_, labels_

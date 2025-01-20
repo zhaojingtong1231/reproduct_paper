@@ -145,6 +145,7 @@ class DistMultPredictor(nn.Module):
                     if etype in self.etypes_dd:
                         if self.proto:
                             src, dst = etype[0], etype[2]
+                            # print(graph)
                             src_rel_idx = torch.where(graph.out_degrees(etype=etype) != 0)
                             dst_rel_idx = torch.where(graph.in_degrees(etype=etype) != 0)
                             src_h = h[src][src_rel_idx]

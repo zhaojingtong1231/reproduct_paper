@@ -484,27 +484,28 @@ class TxGNNPrompt:
                       
         return similar_diseases
                       
-    def load_pretrained(self, path):
+    def load_pretrained(self, model_path):
         ## load config file
         
-        with open(os.path.join(path, 'config.pkl'), 'rb') as f:
-            config = pickle.load(f)
+        # with open(os.path.join(path, 'config.pkl'), 'rb') as f:
+        #     config = pickle.load(f)
             
-        self.model_initialize(**config)
-        self.config = config
-        #self.G = initialize_node_embedding(self.G, config['n_inp'])
+        # self.model_initialize(**config)
+        # self.config = config
+        # #self.G = initialize_node_embedding(self.G, config['n_inp'])
+        #
+        # state_dict = torch.load(os.path.join(path, 'model.pt'), map_location = torch.device('cpu'))
+        # if next(iter(state_dict))[:7] == 'module.':
+        #     # the pretrained model is from data-parallel module
+        #     from collections import OrderedDict
+        #     new_state_dict = OrderedDict()
+        #     for k, v in state_dict.items():
+        #         name = k[7:] # remove `module.`
+        #         new_state_dict[name] = v
+        #     state_dict = new_state_dict
         
-        state_dict = torch.load(os.path.join(path, 'model.pt'), map_location = torch.device('cpu'))
-        if next(iter(state_dict))[:7] == 'module.':
-            # the pretrained model is from data-parallel module
-            from collections import OrderedDict
-            new_state_dict = OrderedDict()
-            for k, v in state_dict.items():
-                name = k[7:] # remove `module.`
-                new_state_dict[name] = v
-            state_dict = new_state_dict
-        
-        self.model.load_state_dict(state_dict)
+        # self.model.load_state_dict(state_dict)
+        self.model.load_state_dict(torch.load(model_path))
         self.model = self.model.to(self.device)
         self.best_model = self.model
         
