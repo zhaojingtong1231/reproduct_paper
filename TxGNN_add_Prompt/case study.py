@@ -33,9 +33,7 @@ TxGNN.model_initialize(n_hid=512,
 TxGNN.load_pretrained('/data/zhaojingtong/PrimeKG/our/random/lr0.001_batch2048_epochs10_hidden512_splitrandom_time12_24_10_46_seed22/fintune_model.pth')
 TxEval = TxEval(model = TxGNN)
 
-result = TxEval.eval_disease_centric(disease_idxs = 'test_set',
-                                     show_plot = False,
-                                     verbose = True,
-                                     save_result = True,
-                                     return_raw = False)
+result = TxEval.eval_disease_centric(disease_idxs = [12661.0, 11318.0],
+                                     relation = 'indication',
+                                     save_result = False)
 print(result)
