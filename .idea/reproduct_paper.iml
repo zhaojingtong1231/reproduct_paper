@@ -5,4 +5,13 @@
     <orderEntry type="jdk" jdkName="Remote Python 3.8.15 (sftp://root@localhost:20022/root/miniconda3/envs/torch21/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="analyzeDoctest" value="false" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+  </component>
 </module>
